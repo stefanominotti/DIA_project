@@ -1,0 +1,19 @@
+{
+    "prices": [], 
+    "bids": [], 
+    "customer_classes": [
+        {   
+            "feature_labels" : [],
+            "feature_values" : [], 
+            "conversion_function_interpolation_values": {
+                "x" : [],
+                "y" : []
+            },
+            "daily_clicks_function_params": {
+                "max": 0,
+                "slope": 0,
+                "noise_std": 0
+            }
+        }
+    ]
+}
