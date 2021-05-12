@@ -93,8 +93,8 @@ class CustomerClass(object):
             raise Exception("Missing parameter for daily clicks function")
         real_func = max_clicks * (1 - np.exp(-slope*bid))
         if noise:
-            return int(np.random.normal(real_func, noise_std))
-        return real_func
+            return round(np.random.normal(real_func, noise_std))
+        return int(round(real_func))
 
     def cost_per_click(self, bid, noise=True):
         try:
@@ -108,7 +108,7 @@ class CustomerClass(object):
         return real_func
 
     def returns(self):
-        return int(self.returns_function.rvs())
+        return int(round(self.returns_function.rvs()[0]))
 
 
 class Customer(object):
