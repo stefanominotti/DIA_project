@@ -3,6 +3,7 @@ from Scenario import Scenario
 from PriceUCBLearner import PriceUCBLearner
 from PriceTSLearner import PriceTSLearner
 from ReturnsEstimator import ReturnsEstimator
+from ContexGeneratorLearner import ContextGeneratorLEarner
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -24,9 +25,9 @@ for exp in range(n_exp):
     print(f'Exp: {exp+1}')
     env_UCB = Environment(scen)
     env_TS = Environment(scen)
-
-    learner_UCB = PriceUCBLearner(scen.prices, [[customer_class for customer_class in scen.customer_classes]])
-    learner_TS = PriceTSLearner(scen.prices, [[customer_class for customer_class in scen.customer_classes]])
+    learner_Context = ContextGeneratorLEarner(scen.prices, scen.customer_classes, PriceUCBLearner, 0.1)
+    learner_UCB = PriceUCBLearner(scen.prices)
+    learner_TS = PriceTSLearner(scen.prices)
     returns_estimator = ReturnsEstimator(scen.customer_classes, scen.rounds_horizon, scen.returns_horizon)
 
     for day in range(1, scen.rounds_horizon + 1):
@@ -35,6 +36,7 @@ for exp in range(n_exp):
         price = learner_UCB.pull_arm()
         customers, returns = env_UCB.round(bid, [price for _ in range(len(scen.customer_classes))])
         learner_UCB.update(customers)
+        learner_Context.update(customers)
         UCB_reward_per_experiment[exp].append(price * len(list(filter(lambda customer: customer.conversion == 1, customers))) / len(customers))
 
         price = learner_TS.pull_arm()
@@ -44,7 +46,11 @@ for exp in range(n_exp):
 
         returns_estimator.update(list(filter(lambda customer: customer.conversion == 1, customers)), returns)
 
-    print(returns_estimator.get_probabilities())
+        if day % 4 == 0:
+            print(learner_Context.generate_contex_tree(learner_UCB, [[0,0], [0,1], [1,0]]))
+
+    #print(returns_estimator.get_probabilities())
+    print(learner_UCB.get_optimal_arm(), learner_TS.get_optimal_arm())
 
 plt.figure()
 

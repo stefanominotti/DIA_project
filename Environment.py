@@ -52,7 +52,8 @@ class CustomerClass(object):
             raise Exception("Duplicate features")
         if len(feature_labels) != len(feature_values):
             raise Exception("Feature labels and values not matching")
-        self.features = [{'name': name, 'value': value} for (name, value) in zip(feature_labels, feature_values)]
+        self.feature_labels = feature_labels
+        self.feature_values = feature_values
         self.conversion_function_interpolation_values = conversion_function_interpolation_values
         self.daily_clicks_function_params = daily_clicks_function_params
 
@@ -70,7 +71,7 @@ class CustomerClass(object):
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            return self.features == other.features
+            return self.feature_values == other.feature_values and self.feature_labels == other.feature_labels
         return False
 
     def conversion(self, price, discrete=True):

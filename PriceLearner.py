@@ -3,10 +3,9 @@ from abc import ABC, abstractmethod
 
 
 class PriceLearner(ABC):
-    def __init__(self, arms, context):
+    def __init__(self, arms):
         self.t = 0
         self.arms = arms
-        self.context = context
         self.pulled_arms = []
         self.collected_customers = []
         self.customers_per_arm = [[] for _ in range(len(self.arms))]
