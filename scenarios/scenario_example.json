@@ -1,0 +1,75 @@
+{
+    "prices": [10,20,30,40,50,60,70,80,90,100], 
+    "bids": [2,3,4,5,6,7,8,9,10,11],
+    "rounds_horizon": 60,
+    "returns_horizon": 30,
+    "features": ["a", "b"],
+    "customer_classes": [
+        {   
+            "feature_values" : [0,0], 
+            "conversion_function_interpolation_values": {
+                "x" : [10,30,50,60,100],
+                "y" : [0.8,0.7,0.5,0.4,0.3]
+            },
+            "daily_clicks_function_params": {
+                "max": 2000,
+                "saturating_x": 9,
+                "noise_std": 100
+            },
+            "returns_function_params": {
+                "mean": 4,
+                "std": 3,
+                "min": 0,
+                "max": 8
+            },
+            "cost_per_click_function_params": {
+                "coefficient": 0.8,
+                "noise_std": 2
+            }
+        },
+        {   
+            "feature_values" : [0,1], 
+            "conversion_function_interpolation_values": {
+                "x" : [10,30,50,70,100],
+                "y" : [0.9,0.5,0.4,0.3,0.2]
+            },
+            "daily_clicks_function_params": {
+                "max": 4000,
+                "saturating_x": 9,
+                "noise_std": 100
+            },
+            "returns_function_params": {
+                "mean": 4,
+                "std": 3,
+                "min": 0,
+                "max": 8
+            },
+            "cost_per_click_function_params": {
+                "coefficient": 0.6,
+                "noise_std": 2
+            }
+        },
+        {   
+            "feature_values" : [1,1], 
+            "conversion_function_interpolation_values": {
+                "x" : [10,15,80,85,100],
+                "y" : [0.9,0.8,0.7,0.6,0.5]
+            },
+            "daily_clicks_function_params": {
+                "max": 3000,
+                "saturating_x": 9,
+                "noise_std": 100
+            },
+            "returns_function_params": {
+                "mean": 4,
+                "std": 3,
+                "min": 0,
+                "max": 8
+            },
+            "cost_per_click_function_params": {
+                "coefficient": 0.7,
+                "noise_std": 2
+            }
+        }
+    ]
+}
