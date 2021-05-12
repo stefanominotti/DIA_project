@@ -3,26 +3,22 @@ from abc import ABC, abstractmethod
 
 
 class PriceLearner(ABC):
-    def __init__(self, arms):
+    def __init__(self, arms, context):
         self.t = 0
         self.arms = arms
+        self.context = context
         self.pulled_arms = []
-        self.collected_rewards = []
-        self.rewards_per_arm = [[] for _ in range(len(self.arms))]
+        self.collected_customers = []
+        self.customers_per_arm = [[] for _ in range(len(self.arms))]
         self.rounds_per_arm = np.zeros(len(self.arms))
-        self.total_observations = 0
-        self.observations_per_arm = np.zeros(len(self.arms))
 
-    def update_observations(self, arm_idx, reward):
+    def update_observations(self, customer):
+        arm_idx = self.arms.index(customer.conversion_price)
         self.t += 1
-
         self.pulled_arms.append(self.arms[arm_idx])
-        self.collected_rewards.append(reward)
-        self.rewards_per_arm[arm_idx].append(reward)
-
+        self.collected_customers.append(customer)
+        self.customers_per_arm[arm_idx].append(customer)
         self.rounds_per_arm[arm_idx] += 1
-        self.total_observations += len(reward)
-        self.observations_per_arm[arm_idx] += len(reward)
 
     @abstractmethod
     def pull_arm(self):
