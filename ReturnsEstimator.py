@@ -28,3 +28,7 @@ class ReturnsEstimator(object):
 
     def get_probabilities(self):
         return self.returns / self.total_customers
+
+    def get_average_returns(self):
+        indices = np.arange(len(self.returns))
+        return (self.get_probabilities() * indices[:, np.newaxis]).sum(axis=0)
