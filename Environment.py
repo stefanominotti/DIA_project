@@ -88,7 +88,7 @@ class CustomerClass(object):
     def daily_clicks(self, bid, noise=True):
         try:
             max_clicks = self.daily_clicks_function_params['max']
-            slope = -np.log(0.05) / self.daily_clicks_function_params['saturating_x']
+            slope = -np.log(0.01) / self.daily_clicks_function_params['saturating_x']
             noise_std = self.daily_clicks_function_params['noise_std']
         except KeyError:
             raise Exception("Missing parameter for daily clicks function")
