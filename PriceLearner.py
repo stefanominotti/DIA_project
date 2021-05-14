@@ -10,6 +10,7 @@ class PriceLearner(ABC):
         self.collected_customers = []
         self.customers_per_arm = [[] for _ in range(len(self.arms))]
         self.rounds_per_arm = np.zeros(len(self.arms))
+        self.rewards_per_arm = [[] for _ in range(len(self.arms))]
 
     def update_observations(self, customer):
         arm_idx = self.arms.index(customer.conversion_price)
@@ -24,6 +25,6 @@ class PriceLearner(ABC):
         pass
 
     @abstractmethod
-    def update(self, pulled_arm, reward):
+    def update(self, customer):
         pass
     

@@ -17,6 +17,7 @@ class PriceTSLearner(PriceLearner):
             arm_idx = self.arms.index(customer.conversion_price)
             self.beta_distribution_per_arm[arm_idx, 0] += customer.conversion
             self.beta_distribution_per_arm[arm_idx, 1] += (1.0 - customer.conversion)
+            self.rewards_per_arm[arm_idx].append(customer.conversion * customer.conversion_price)
 
     def get_optimal_arm(self):
         alpha = self.beta_distribution_per_arm[:, 0] 
