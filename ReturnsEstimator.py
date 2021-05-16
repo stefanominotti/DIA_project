@@ -32,3 +32,6 @@ class ReturnsEstimator(object):
     def get_average_returns(self):
         indices = np.arange(len(self.returns))
         return (self.get_probabilities() * indices[:, np.newaxis]).sum(axis=0)
+
+    def pdf(self, x):
+        return np.mean([calss_returns[x]/calss_returns.sum() for calss_returns in self.returns.T])

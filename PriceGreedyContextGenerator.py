@@ -97,7 +97,9 @@ class PriceGreedyContextGenerator(object):
 
     def generate_learner(self, context):
         learner = self.learner_class(self.arms)
-        learner.update(self.filter_customers_by_context(context))
+        customers = self.filter_customers_by_context(context)
+        if len(customers) > 0:
+            learner.update(customers)
         return learner
     
     def filter_customers_by_context(self, context):

@@ -1,7 +1,9 @@
+from PriceGreedyContextGenerator import PriceGreedyContextGenerator
 import numpy as np
 
-class ContextGeneratorLEarner(object):
+class PriceContexManager(object):
     def __init__(self, arms, customer_classes, bandit_class, hoeffding_confidence):
+        self.day = 0
         self.arms = arms
         self.bandit_class = bandit_class
         self.customer_classes = customer_classes
@@ -11,7 +13,7 @@ class ContextGeneratorLEarner(object):
         self.context_to_class = [customer_class.feature_values for customer_class in self.customer_classes]
         self.context_to_bandit = [self.bandit_class(self.arms)]
         self.all_rewards_per_day = []
-        print(self.features)
+
 
     def pull_arm(self):
         arms = [None for _ in self.customer_classes]
@@ -21,15 +23,18 @@ class ContextGeneratorLEarner(object):
                 arms[class_idx] = price
         return arms
 
-    def update(self, rewards):
-        self.all_rewards_per_day.append(rewards)
+    def update(self, customers):
+        self.day += 1
+        self.all_rewards_per_day.append(customers)
         rewards_per_context = [[] for _ in range(len(self.context_to_class))]
-        for reward in rewards:
-            class_idx = self.customer_classes.index(reward.customer_class)
+        for customer in customers:
+            class_idx = self.customer_classes.index(customer.customer_class)
             context_idx = self.class_to_context[class_idx]
-            rewards_per_context[context_idx].append(reward)
+            rewards_per_context[context_idx].append(customer)
         for context_idx, bandit in enumerate(self.context_to_bandit):
             bandit.update(rewards_per_context[context_idx])
+        if self.day % 100 == 0:
+            self.update_contexts()
 
     def update_contexts(self):
         bandit = self.bandit_class(self.arms)
@@ -116,7 +121,7 @@ class ContextGeneratorLEarner(object):
     def get_expected_rewards_by_bandit(self, rewards):
         bandit = self.bandit_class(self.arms)
         for daily_reward in rewards:
-            bandit.update( daily_reward)
+            bandit.update(daily_reward)
         optimal_arm = bandit.get_optimal_arm()
         best_rewards = list(map(lambda x: x.conversion*optimal_arm, bandit.customers_per_arm[bandit.arms.index(optimal_arm)]))
         return best_rewards, bandit
