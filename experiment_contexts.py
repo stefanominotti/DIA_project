@@ -19,17 +19,18 @@ for customer_class in scen.customer_classes:
         true_rewards.append(customer_class.conversion(p, discrete=False) * p * (1 + customer_class.returns_function_params['mean']))
     optimal_per_class.append(true_rewards[np.argmax(true_rewards)])
 
-n_exp = 1
-reward_per_class_per_experiment = [[[] for _ in range(n_exp)] for _ in range(len(scen.customer_classes))]
+fig, axes = plt.subplots(2)
 
-for exp in range(n_exp):
-    print(f'Exp: {exp+1}')
-    env = Environment(scen)
-    context_generator_TS = PriceGreedyContextGenerator(scen.features, scen.customer_classes, PriceTSLearner, scen.prices, 0.01)
-    context_generator_UCB = PriceGreedyContextGenerator(scen.features, scen.customer_classes, PriceUCBLearner, scen.prices, 0.01)
+for idx, learner_class in enumerate((PriceUCBLearner, PriceTSLearner)):
+    print(learner_class.__name__)
+    n_exp = 1
+    reward_per_class_per_experiment = [[[] for _ in range(n_exp)] for _ in range(len(scen.customer_classes))]
 
-    for context_generator in [context_generator_TS, context_generator_UCB]:
-        print('change generator')
+    for exp in range(n_exp):
+        print(f'Exp: {exp+1}')
+        env = Environment(scen)
+        context_generator = PriceGreedyContextGenerator(scen.features, scen.customer_classes, learner_class, scen.prices, 0.01)
+
         contexts, learners = context_generator.get_best_contexts()
         customers_per_day = []
 
@@ -61,19 +62,17 @@ for exp in range(n_exp):
                     class_customers = list(filter(lambda customer: customer.customer_class == customer_class, delayed_customers))
                     reward_per_class_per_experiment[class_idx][exp].append(sum(list(map(lambda x: x.conversion_price * (1 + x.returns_count), list(filter(lambda customer: customer.conversion == 1, class_customers))))) / len(class_customers))
 
-    #print(returns_estimator.get_probabilities())
-    print(list(map(lambda x: x.get_optimal_arm(), learners)))
+        #print(returns_estimator.get_probabilities())
+        print(list(map(lambda x: x.get_optimal_arm(), learners)))
 
-plt.figure()
+    for class_idx, customer_class in enumerate(scen.customer_classes):
+        axes[idx].plot(np.cumsum(np.mean(np.subtract(optimal_per_class[class_idx], reward_per_class_per_experiment[class_idx]), axis=0)), 'C' + str(class_idx))
 
-for class_idx, customer_class in enumerate(scen.customer_classes):
-    plt.plot(np.cumsum(np.mean(np.subtract(optimal_per_class[class_idx], reward_per_class_per_experiment[class_idx]), axis=0)), 'C' + str(class_idx))
+    # plt.subplot(212)
+    # plt.plot(np.mean(UCB_reward_per_experiment, axis=0), 'r')
+    # plt.plot(np.mean(TS_reward_per_experiment, axis=0), 'g')
 
-# plt.subplot(212)
-# plt.plot(np.mean(UCB_reward_per_experiment, axis=0), 'r')
-# plt.plot(np.mean(TS_reward_per_experiment, axis=0), 'g')
-
-# plt.plot(np.mean(opt_reward_per_experiment, axis=0), 'r')
-# plt.plot(np.mean(opt2_reward_per_experiment, axis=0), 'g')
+    # plt.plot(np.mean(opt_reward_per_experiment, axis=0), 'r')
+    # plt.plot(np.mean(opt2_reward_per_experiment, axis=0), 'g')
 
 plt.show()
