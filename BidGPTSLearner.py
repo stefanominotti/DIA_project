@@ -1,8 +1,11 @@
+from os import altsep
 import numpy as np
 from scipy.stats import norm
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF, ConstantKernel
 from sklearn.preprocessing import StandardScaler
+import warnings
+warnings.filterwarnings('ignore')
 
 
 class BidGPTSLearner(object):
@@ -18,7 +21,7 @@ class BidGPTSLearner(object):
         self.sigmas = np.ones(len(self.arms)) * 1e3
         self.alpha = 10
         self.kernel = ConstantKernel(1, (1e-3, 1e3)) * RBF(1, (1e-3, 1e3))
-        self.gp = GaussianProcessRegressor(kernel=self.kernel, alpha=1e-10, normalize_y=True, n_restarts_optimizer=9)
+        self.gp = GaussianProcessRegressor(kernel=self.kernel, alpha=self.alpha, normalize_y=True, n_restarts_optimizer=9)
         self.scaler = StandardScaler()
 
     def update_observations(self, arm_idx, reward):

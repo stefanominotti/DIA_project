@@ -21,7 +21,7 @@ for customer_class in scen.customer_classes:
 
 fig, axes = plt.subplots(2)
 
-for idx, learner_class in enumerate((PriceUCBLearner, PriceTSLearner)):
+for idx, learner_class in enumerate([PriceTSLearner]):
     print(learner_class.__name__)
     n_exp = 1
     reward_per_class_per_experiment = [[[] for _ in range(n_exp)] for _ in range(len(scen.customer_classes))]

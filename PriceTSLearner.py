@@ -1,20 +1,22 @@
 import numpy as np
 from PriceLearner import PriceLearner
-
+from ReturnsEstimator import ReturnsEstimator
 
 class PriceTSLearner(PriceLearner):
     def __init__(self, arms):
         super().__init__(arms)
+        self.returns_estiamtor = ReturnsEstimator(30)
         self.beta_distribution_per_arm = np.ones((len(self.arms), 2))
         self.mean_returns = 0
         self.sigma_returns = 1
         self.returns_counts = []
 
     def pull_arm(self):
-        priced_samples = np.random.beta(self.beta_distribution_per_arm[:, 0], self.beta_distribution_per_arm[:, 1]) * (1 + np.random.normal(self.mean_returns, self.sigma_returns)) * self.arms
+        priced_samples = np.random.beta(self.beta_distribution_per_arm[:, 0], self.beta_distribution_per_arm[:, 1]) * (1 + self.returns_estiamtor.rsv()) * self.arms
         return self.arms[np.random.choice(np.argwhere(priced_samples == priced_samples.max()).reshape(-1))]
  
     def update(self, customers):
+        self.returns_estiamtor.update(list(filter(lambda customer: customer.conversion == 1 ,customers)))
         for customer in customers:
             self.update_observations(customer)
             arm_idx = self.arms.index(customer.conversion_price)
@@ -31,4 +33,4 @@ class PriceTSLearner(PriceLearner):
     def get_optimal_arm(self):
         alpha = self.beta_distribution_per_arm[:, 0] 
         beta = self.beta_distribution_per_arm[:, 1] 
-        return self.arms[np.argmax(alpha / (alpha + beta) * (1 + self.mean_returns) * self.arms)]
+        return self.arms[np.argmax(alpha / (alpha + beta) * (1 + self.returns_estiamtor.weihgted_sum()) * self.arms)]
