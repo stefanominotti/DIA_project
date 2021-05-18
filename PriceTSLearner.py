@@ -24,7 +24,9 @@ class PriceTSLearner(PriceLearner):
             if customer.conversion:
                 self.returns_counts.append(customer.returns_count)
         self.mean_returns = np.mean(self.returns_counts)
-        self.sigma_returns = np.std(self.returns_counts)
+        n_samples = self.samples_per_arm[arm_idx]
+        if n_samples > 1:
+            self.sigma_returns = np.std(self.returns_counts) / n_samples
 
     def get_optimal_arm(self):
         alpha = self.beta_distribution_per_arm[:, 0] 
