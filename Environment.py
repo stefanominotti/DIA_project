@@ -94,7 +94,7 @@ class CustomerClass(object):
             raise Exception("Missing parameter for daily clicks function")
         real_func = max_clicks * (1 - np.exp(-slope*bid))
         if noise:
-            return round(np.random.normal(real_func, noise_std))
+            return round(np.random.normal(real_func, noise_std*real_func))
         return int(round(real_func))
 
     def cost_per_click(self, bid, noise=True):
@@ -105,7 +105,7 @@ class CustomerClass(object):
             raise Exception("Missing parameter for cost per click function")
         real_func = coefficient * bid
         if noise:
-            return np.random.normal(real_func, noise_std)
+            return np.random.normal(real_func, noise_std*real_func)
         return real_func
 
     def returns(self):
@@ -136,5 +136,5 @@ class SubCampaign(object):
         self.daily_clicks = [customer_class.daily_clicks(bid) for customer_class in self.customer_classes]
         self.daily_customers = []
         for customer_class_idx, customer_class in enumerate(self.customer_classes):
-            cost_per_click = customer_class.cost_per_click(bid)
+            cost_per_click = customer_class.cost_per_click(bid) 
             self.daily_customers.extend([Customer(customer_class, bid, cost_per_click) for _ in range(self.daily_clicks[customer_class_idx])])

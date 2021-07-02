@@ -7,24 +7,27 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 scen = Scenario('scenario_example')
-bid = [np.random.choice(scen.bids)]
-objectiveFunction = ObjectiveFunction(scen)
+bid = [scen.bids[0]]
+objectiveFunction = ObjectiveFunction(scen, bids=bid)
 
 print(f'Bid {bid}')
 
 optimal, p1, b1 = objectiveFunction.get_optimal_price_bid()
 print(f'optimal price {p1}')
+print(optimal)
 
 fig, axes = plt.subplots(2)
 
-for idx, learner_class in enumerate((PriceUCBLearner, PriceTSLearner)):
-    n_exp = 1
+for idx, learner_class in enumerate([PriceUCBLearner, PriceTSLearner]):
+    learner_class = PriceTSLearner
+    print(learner_class.__name__)
+    n_exp = 5
     reward_per_experiment = [[] for _ in range(n_exp)]
 
     for exp in range(n_exp):
         print(f'Exp: {exp+1}')
         env = Environment(scen)
-        learner = learner_class(scen.prices)
+        learner = learner_class(scen.prices, scen.returns_horizon)
 
         customers_per_day = []
         for day in range(1, scen.rounds_horizon):
@@ -32,12 +35,14 @@ for idx, learner_class in enumerate((PriceUCBLearner, PriceTSLearner)):
 
             price = learner.pull_arm()
             customers, returns = env.round(bid, [price for _ in range(len(scen.customer_classes))])
+            learner.update(customers, returns)
             customers_per_day.append(customers)
-            if day > 30:
+            if day > scen.returns_horizon:
                 delayed_customers = customers_per_day.pop(0)
-                learner.update(delayed_customers)
-                reward_per_experiment[exp].append(sum(list(map(lambda x: x.conversion_price * (1 + x.returns_count), list(filter(lambda customer: customer.conversion == 1, delayed_customers))))) / len(delayed_customers))
+                reward_per_experiment[exp].append(sum(list(map(lambda x: x.conversion * x.conversion_price * (1 + x.returns_count) - x.cost_per_click, delayed_customers))))
+                print(reward_per_experiment[exp][-1])
             print(price)
+            
 
         print(learner.get_optimal_arm())
 

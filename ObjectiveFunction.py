@@ -30,7 +30,7 @@ class ObjectiveFunction(object):
     def get_optimal_price_bid(self):
         total_rewards = []
         best_bids = []
-        returns_values = np.array([sum([x*customer_class.returns_function.pdf(x) for x in range(self.scen.returns_horizon)]) for customer_class in self.scen.customer_classes])
+        returns_values = np.array([sum([x*(customer_class.returns_function.cdf(x+0.5) - customer_class.returns_function.cdf(x-0.5)) for x in range(self.scen.returns_horizon)]) for customer_class in self.scen.customer_classes])
         for p in self.prices:
             price_reward = np.array([customer_class.conversion(p, discrete=False) * p for customer_class in self.scen.customer_classes])
             bid_rewards = []
@@ -44,4 +44,5 @@ class ObjectiveFunction(object):
         optimal_price = self.prices[np.argmax(total_rewards)]
         optimal_bid =  best_bids[np.argmax(total_rewards)]
         return optimal, optimal_price, optimal_bid
+
 

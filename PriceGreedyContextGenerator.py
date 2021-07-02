@@ -2,25 +2,27 @@ import numpy as np
 
 
 class PriceGreedyContextGenerator(object):
-    def __init__(self, features, customer_classes, learner_class, arms, hoeffding_confidence):
+    def __init__(self, features, customer_classes, learner_class, arms, returns_horizon, hoeffding_confidence):
         self.features = features
         self.customer_classes = customer_classes
         for customer_class in self.customer_classes:
             if customer_class.feature_labels != self.features:
                 raise Exception("Customer classes must have the same features of the provided list")
-
+        self.t = 0
         self.learner_class = learner_class
         self.arms = arms
+        self.returns_horizon = returns_horizon
         self.hoeffding_confidence = hoeffding_confidence
-        self.customers = []
+        self.customers_per_day = []
         self.contexts = []
         self.learners = []
 
     def update(self, customers):
-        self.customers.extend(customers)
+        self.t += 1
+        self.customers_per_day.append(customers)
 
     def get_best_contexts(self):
-        if len(self.customers) == 0:
+        if len(self.customers_per_day) == 0 or self.t <= self.returns_horizon:
             base_learner = self.generate_learner(self.customer_classes)
             self.contexts.append(self.customer_classes)
             self.learners.append(base_learner)
@@ -50,8 +52,11 @@ class PriceGreedyContextGenerator(object):
         left_context = list(filter(lambda customer_class: customer_class.feature_values[feature_idx] == 0, context))
         right_context = list(filter(lambda customer_class: customer_class.feature_values[feature_idx] == 1, context))
 
-        left_context_customers = self.filter_customers_by_context(left_context)
-        right_context_customers = self.filter_customers_by_context(right_context)
+        customers = [customer for day in self.customers_per_day for customer in day]
+        print(len(customers))
+
+        left_context_customers = self.filter_customers_by_context(left_context, customers)
+        right_context_customers = self.filter_customers_by_context(right_context, customers)
 
         total_customers = len(left_context_customers) + len(right_context_customers)
         p_left = self.get_hoeffding_lower_bound(len(left_context_customers)/total_customers,
@@ -96,14 +101,15 @@ class PriceGreedyContextGenerator(object):
         return len(set(map(lambda customer_class: customer_class.feature_values[feature_idx], context))) > 1
 
     def generate_learner(self, context):
-        learner = self.learner_class(self.arms)
-        customers = self.filter_customers_by_context(context)
-        if len(customers) > 0:
-            learner.update(customers)
+        learner = self.learner_class(self.arms, self.returns_horizon)
+        for daily_customers in self.customers_per_day:
+            customers = self.filter_customers_by_context(context, daily_customers)
+            if len(customers) > 0:
+                learner.update(customers, [])
         return learner
     
-    def filter_customers_by_context(self, context):
-        return list(filter(lambda customer: customer.customer_class in context, self.customers)) 
+    def filter_customers_by_context(self, context, customers):
+        return list(filter(lambda customer: customer.customer_class in context, customers)) 
 
     def get_hoeffding_lower_bound(self, mean, cardinality):
         if cardinality == 0:

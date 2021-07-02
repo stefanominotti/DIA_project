@@ -4,6 +4,7 @@ from PriceUCBLearner import PriceUCBLearner
 from PriceTSLearner import PriceTSLearner
 from ReturnsEstimator import ReturnsEstimator
 from PriceGreedyContextGenerator import PriceGreedyContextGenerator
+from ObjectiveFunction import ObjectiveFunction
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -12,12 +13,13 @@ bid = [np.random.choice(scen.bids)]
 
 print(f'Bid {bid}')
 
-optimal_per_class = []
-for customer_class in scen.customer_classes:
-    true_rewards = []
-    for p in scen.prices:
-        true_rewards.append(customer_class.conversion(p, discrete=False) * p * (1 + customer_class.returns_function_params['mean']))
-    optimal_per_class.append(true_rewards[np.argmax(true_rewards)])
+objectiveFunction = ObjectiveFunction(scen, bids=bid)
+
+print(f'Bid {bid}')
+
+optimal, p1, b1 = objectiveFunction.get_optimals_price_bid_per_class()
+print(f'optimal price {p1}')
+print(f'optimal {optimal}')
 
 fig, axes = plt.subplots(2)
 
@@ -29,7 +31,7 @@ for idx, learner_class in enumerate([PriceTSLearner]):
     for exp in range(n_exp):
         print(f'Exp: {exp+1}')
         env = Environment(scen)
-        context_generator = PriceGreedyContextGenerator(scen.features, scen.customer_classes, learner_class, scen.prices, 0.01)
+        context_generator = PriceGreedyContextGenerator(scen.features, scen.customer_classes, learner_class, scen.prices, scen.returns_horizon, 0.01)
 
         contexts, learners = context_generator.get_best_contexts()
         customers_per_day = []
@@ -52,15 +54,19 @@ for idx, learner_class in enumerate([PriceTSLearner]):
 
             customers, returns = env.round(bid, prices)
             customers_per_day.append(customers)
+
+            context_generator.update(customers)
+
+            for context_idx, context in enumerate(contexts):
+                learners[context_idx].update(list(filter(lambda customer: customer.customer_class in context, customers)),
+                                             list(filter(lambda customer: customer.customer_class in context, returns)))
+
             if day > 30:
                 delayed_customers = customers_per_day.pop(0)
-                context_generator.update(delayed_customers)
-                for context_idx, context in enumerate(contexts):
-                    learners[context_idx].update(list(filter(lambda customer: customer.customer_class in context, delayed_customers)))
 
                 for class_idx, customer_class in enumerate(scen.customer_classes):
                     class_customers = list(filter(lambda customer: customer.customer_class == customer_class, delayed_customers))
-                    reward_per_class_per_experiment[class_idx][exp].append(sum(list(map(lambda x: x.conversion_price * (1 + x.returns_count), list(filter(lambda customer: customer.conversion == 1, class_customers))))) / len(class_customers))
+                    reward_per_class_per_experiment[class_idx][exp].append(sum(list(map(lambda x: x.conversion_price * (1 + x.returns_count), list(filter(lambda customer: customer.conversion == 1, class_customers))))))
 
         #print(returns_estimator.get_probabilities())
         print(list(map(lambda x: x.get_optimal_arm(), learners)))

@@ -8,9 +8,12 @@ class ReturnsEstimator(object):
         self.total_customers = 0
         self.returns_counts = [0 for _ in range(self.returns_horizon + 1)]
         
-    def update(self, customers):
+    def update(self, customers, returns):
         for customer in customers:
             self.total_customers += 1
+            self.returns_counts[customer.returns_count] += 1
+        for customer in returns:
+            self.returns_counts[customer.returns_count - 1] -= 1
             self.returns_counts[customer.returns_count] += 1
 
     def rsv(self):

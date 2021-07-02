@@ -30,7 +30,7 @@ class BidGPTSLearner(object):
         self.collected_rewards.append(reward)
         self.rewards_per_arm[arm_idx].append(reward)
         self.rounds_per_arm[arm_idx] += 1
-
+    
     def update_model(self):
         x = np.atleast_2d(self.pulled_arms).T
         y = self.collected_rewards

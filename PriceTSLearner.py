@@ -1,36 +1,26 @@
 import numpy as np
 from PriceLearner import PriceLearner
-from ReturnsEstimator import ReturnsEstimator
+
 
 class PriceTSLearner(PriceLearner):
-    def __init__(self, arms):
-        super().__init__(arms)
-        self.returns_estiamtor = ReturnsEstimator(30)
+    def __init__(self, arms, returns_horizon):
+        super().__init__(arms, returns_horizon)
         self.beta_distribution_per_arm = np.ones((len(self.arms), 2))
-        self.mean_returns = 0
-        self.sigma_returns = 1
-        self.returns_counts = []
 
     def pull_arm(self):
-        priced_samples = np.random.beta(self.beta_distribution_per_arm[:, 0], self.beta_distribution_per_arm[:, 1]) * (1 + self.returns_estiamtor.rsv()) * self.arms
+        priced_samples = np.random.beta(self.beta_distribution_per_arm[:, 0], self.beta_distribution_per_arm[:, 1]) * (1 + self.returns_estimator.weihgted_sum()) * self.arms
         return self.arms[np.random.choice(np.argwhere(priced_samples == priced_samples.max()).reshape(-1))]
  
-    def update(self, customers):
-        self.returns_estiamtor.update(list(filter(lambda customer: customer.conversion == 1 ,customers)))
+    def update(self, customers, returns):
+        self.update_returns(customers, returns)
         for customer in customers:
             self.update_observations(customer)
             arm_idx = self.arms.index(customer.conversion_price)
-            self.rewards_per_arm[arm_idx].append(customer.conversion * customer.conversion_price * (1 + customer.returns_count))
             self.beta_distribution_per_arm[arm_idx, 0] += customer.conversion
             self.beta_distribution_per_arm[arm_idx, 1] += (1.0 - customer.conversion)
-            if customer.conversion:
-                self.returns_counts.append(customer.returns_count)
-        self.mean_returns = np.mean(self.returns_counts)
-        n_samples = self.samples_per_arm[arm_idx]
-        if n_samples > 1:
-            self.sigma_returns = np.std(self.returns_counts) / n_samples
+        self.update_rewards(customers)
 
     def get_optimal_arm(self):
         alpha = self.beta_distribution_per_arm[:, 0] 
         beta = self.beta_distribution_per_arm[:, 1] 
-        return self.arms[np.argmax(alpha / (alpha + beta) * (1 + self.returns_estiamtor.weihgted_sum()) * self.arms)]
+        return self.arms[np.argmax(alpha / (alpha + beta) * (1 + self.returns_estimator.weihgted_sum()) * self.arms)]
