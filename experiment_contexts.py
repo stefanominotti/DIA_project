@@ -66,13 +66,13 @@ for idx, learner_class in enumerate([PriceTSLearner]):
 
                 for class_idx, customer_class in enumerate(scen.customer_classes):
                     class_customers = list(filter(lambda customer: customer.customer_class == customer_class, delayed_customers))
-                    reward_per_class_per_experiment[class_idx][exp].append(sum(list(map(lambda x: x.conversion_price * (1 + x.returns_count), list(filter(lambda customer: customer.conversion == 1, class_customers))))))
+                    reward_per_class_per_experiment[class_idx][exp].append(sum(list(map(lambda x: x.conversion * x.conversion_price * (1 + x.returns_count) - x.cost_per_click, class_customers))))
 
         #print(returns_estimator.get_probabilities())
         print(list(map(lambda x: x.get_optimal_arm(), learners)))
 
     for class_idx, customer_class in enumerate(scen.customer_classes):
-        axes[idx].plot(np.cumsum(np.mean(np.subtract(optimal_per_class[class_idx], reward_per_class_per_experiment[class_idx]), axis=0)), 'C' + str(class_idx))
+        axes[idx].plot(np.cumsum(np.mean(np.subtract(optimal[class_idx], reward_per_class_per_experiment[class_idx]), axis=0)), 'C' + str(class_idx))
 
     # plt.subplot(212)
     # plt.plot(np.mean(UCB_reward_per_experiment, axis=0), 'r')

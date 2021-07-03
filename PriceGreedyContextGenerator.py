@@ -53,7 +53,6 @@ class PriceGreedyContextGenerator(object):
         right_context = list(filter(lambda customer_class: customer_class.feature_values[feature_idx] == 1, context))
 
         customers = [customer for day in self.customers_per_day for customer in day]
-        print(len(customers))
 
         left_context_customers = self.filter_customers_by_context(left_context, customers)
         right_context_customers = self.filter_customers_by_context(right_context, customers)

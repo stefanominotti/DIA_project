@@ -11,7 +11,7 @@ class ObjectiveFunction(object):
 
     def get_optimals_price_bid_per_class(self):
         rewards_per_prices = []
-        returns_values = np.array([sum([x*customer_class.returns_function.pdf(x) for x in range(self.scen.returns_horizon)]) for customer_class in self.scen.customer_classes])
+        returns_values = np.array([sum([x*(customer_class.returns_function.cdf(x+0.5) - customer_class.returns_function.cdf(x-0.5)) for x in range(self.scen.returns_horizon)]) for customer_class in self.scen.customer_classes])
         for p in self.prices:
             rewards_per_prices.append(np.array([customer_class.conversion(p, discrete=False) * p for customer_class in self.scen.customer_classes]))
         rewards_per_prices = np.concatenate(list(map(lambda x: np.transpose([x]), rewards_per_prices)), axis=1)
