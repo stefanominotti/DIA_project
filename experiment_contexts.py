@@ -17,7 +17,7 @@ objectiveFunction = ObjectiveFunction(scen, bids=bid)
 
 print(f'Bid {bid}')
 
-optimal, p1, b1 = objectiveFunction.get_optimals_price_bid_per_class()
+optimal, p1, b1 = objectiveFunction.get_optimal_discrimination()
 print(f'optimal price {p1}')
 print(f'optimal {optimal}')
 

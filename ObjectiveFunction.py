@@ -9,7 +9,7 @@ class ObjectiveFunction(object):
         self.prices = prices if prices != None else self.scen.prices
         self.bids = bids if bids != None else self.scen.bids
 
-    def get_optimals_price_bid_per_class(self):
+    def get_optimal_discrimination(self):
         rewards_per_prices = []
         returns_values = np.array([sum([x*(customer_class.returns_function.cdf(x+0.5) - customer_class.returns_function.cdf(x-0.5)) for x in range(self.scen.returns_horizon)]) for customer_class in self.scen.customer_classes])
         for p in self.prices:
@@ -27,7 +27,7 @@ class ObjectiveFunction(object):
         optimal_bids =  np.take(self.bids, np.argmax(total_rewards, axis=1))
         return optimals, optimal_prices, optimal_bids
 
-    def get_optimal_price_bid(self):
+    def get_optimal_no_discrimination(self):
         total_rewards = []
         best_bids = []
         returns_values = np.array([sum([x*(customer_class.returns_function.cdf(x+0.5) - customer_class.returns_function.cdf(x-0.5)) for x in range(self.scen.returns_horizon)]) for customer_class in self.scen.customer_classes])
@@ -38,6 +38,7 @@ class ObjectiveFunction(object):
                 daily_clicks = np.array([customer_class.daily_clicks(b, noise=False) for customer_class in self.scen.customer_classes])
                 cpc = np.array([customer_class.cost_per_click(b, noise=False) for customer_class in self.scen.customer_classes])
                 bid_rewards.append(((price_reward * (1 + returns_values) - cpc)*daily_clicks).sum())
+            print(bid_rewards)
             total_rewards.append(np.max(bid_rewards))
             best_bids.append(self.bids[np.argmax(bid_rewards)])
         optimal = np.max(total_rewards)

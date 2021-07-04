@@ -1,6 +1,6 @@
 {
     "prices": [0.5,1,1.5,2,2.5,3,3.5,4,4.5,5], 
-    "bids": [0.25,0.5,0.75,1,1.25,1.5,1.75,2,2.25,2.5],
+    "bids": [0.8,1.6,2.4,3.2,4,4.8,5.6,6.4,7.2,8],
     "rounds_horizon": 365,
     "returns_horizon": 30,
     "features": ["under 30", "sporty"],
@@ -13,7 +13,7 @@
             },
             "daily_clicks_function_params": {
                 "max": 400,
-                "saturating_x": 2.45,
+                "saturating_x": 7.5,
                 "noise_std": 0.05
             },
             "returns_function_params": {
@@ -35,7 +35,7 @@
             },
             "daily_clicks_function_params": {
                 "max": 800,
-                "saturating_x": 2.25,
+                "saturating_x": 7.5,
                 "noise_std": 0.05
             },
             "returns_function_params": {
@@ -57,7 +57,7 @@
             },
             "daily_clicks_function_params": {
                 "max": 1000,
-                "saturating_x": 2.25,
+                "saturating_x": 7.5,
                 "noise_std": 0.05
             },
             "returns_function_params": {
