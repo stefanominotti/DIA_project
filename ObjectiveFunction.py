@@ -15,6 +15,7 @@ class ObjectiveFunction(object):
         for p in self.prices:
             rewards_per_prices.append(np.array([customer_class.conversion(p, discrete=False) * p for customer_class in self.scen.customer_classes]))
         rewards_per_prices = np.concatenate(list(map(lambda x: np.transpose([x]), rewards_per_prices)), axis=1)
+        print(rewards_per_prices)
         prices_rewards = np.max(rewards_per_prices, axis=1)
         optimal_prices =  np.take(self.prices, np.argmax(rewards_per_prices, axis=1))
         total_rewards = []

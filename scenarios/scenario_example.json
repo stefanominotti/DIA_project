@@ -9,11 +9,11 @@
             "feature_values" : [1,0], 
             "conversion_function_interpolation_values": {
                 "x" : [0.5,1.5,2.5,3.5,5],
-                "y" : [0.6,0.3,0.2,0.1,0.05]
+                "y" : [0.6,0.35,0.2,0.1,0.05]
             },
             "daily_clicks_function_params": {
                 "max": 400,
-                "saturating_x": 7.5,
+                "saturating_x": 4,
                 "noise_std": 0.05
             },
             "returns_function_params": {
@@ -35,7 +35,7 @@
             },
             "daily_clicks_function_params": {
                 "max": 800,
-                "saturating_x": 7.5,
+                "saturating_x": 6,
                 "noise_std": 0.05
             },
             "returns_function_params": {

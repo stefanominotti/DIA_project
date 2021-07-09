@@ -1,3 +1,4 @@
+from JointLearner import JointLearner
 from BidGTSLearner import BidGTSLearner
 from ObjectiveFunction import ObjectiveFunction
 from Environment import Environment
@@ -27,9 +28,9 @@ optimal = true_rewards[np.argmax(true_rewards)]
 optimal_bid = scen.bids[np.argmax(true_rewards)]
 
 objective_function = ObjectiveFunction(scenario=scen, prices=[price])
-optimal, _, optimal_bid = objective_function.get_optimal_no_discrimination()
+optimal, optimal_price, optimal_bid = objective_function.get_optimal_no_discrimination()
 
-print(optimal, optimal_bid)
+print(optimal, optimal_price, optimal_bid)
 
 conversion_rates = []
 returns_values = []
@@ -39,13 +40,10 @@ returns_values_per_class = np.array([customer_class.returns_function.mean() for 
 for b in scen.bids:
     daily_clicks = np.array([customer_class.daily_clicks(b, noise=False) for customer_class in scen.customer_classes])
     conversion_rates.append((conversion_rates_per_class * daily_clicks).sum() / daily_clicks.sum())
-    returns_values.append((returns_values_per_class * conversion_rates_per_class * daily_clicks).sum() / (daily_clicks * conversion_rates_per_class).sum())
+    returns_values.append((returns_values_per_class * daily_clicks).sum() / daily_clicks.sum())
 
 conversion_rates = np.array(conversion_rates)
 returns_values = np.array(returns_values)
-
-print(returns_values)
-exit()
 
 n_exp = 5
 reward_per_experiment = [[] for _ in range(n_exp)]
@@ -53,21 +51,27 @@ reward_per_experiment = [[] for _ in range(n_exp)]
 for exp in range(n_exp):
     print(f'Exp: {exp+1}')
     env = Environment(scen)
-    learner = BidGTSLearner(scen.bids, 0.2, scen.returns_horizon)
+    learner = JointLearner(scen.prices, scen.bids, 0.2)
+    context_generator = PriceGreedyContextGenerator(scen.features, scen.customer_classes, PriceTSLearner, scen.prices, scen.returns_horizon, 0.01)
     customers_per_day = []
+    prices_per_day = []
     bids_per_day = []
+
+    contexts, price_learners = context_generator.get_best_contexts()
+    learner.set_price_learner()
 
     for day in range(scen.rounds_horizon):
         print(f'Day: {day+1}')
         
-        bid = learner.pull_arm(conversion_rates, price)
-        customers, returns = env.round([bid], prices)
+        price, bid = learner.pull_arm()
+        customers, returns = env.round([bid], [price, price, price])
         customers_per_day.append(customers)
+        prices_per_day.append(price)
         bids_per_day.append(bid)
         reward = 0
-        learner.update(bid, customers, returns)
+        learner.update(price, bid, customers, returns)
 
-        print(bid)
+        print(price, bid)
 
         if day > 30:
             delayed_customers = customers_per_day.pop(0)

@@ -2,30 +2,30 @@ import numpy as np
 
 
 class PriceGreedyContextGenerator(object):
-    def __init__(self, features, customer_classes, learner_class, arms, returns_horizon, hoeffding_confidence):
+    def __init__(self, features, customer_classes, learner_class, arms, returns_horizon, confidence):
         self.features = features
         self.customer_classes = customer_classes
         for customer_class in self.customer_classes:
             if customer_class.feature_labels != self.features:
                 raise Exception("Customer classes must have the same features of the provided list")
-        self.t = 0
+        self.day = 0
         self.learner_class = learner_class
         self.arms = arms
         self.returns_horizon = returns_horizon
-        self.hoeffding_confidence = hoeffding_confidence
+        self.confidence = confidence
         self.customers_per_day = []
         self.contexts = []
         self.learners = []
 
     def update(self, customers):
-        self.t += 1
+        self.day += 1
         self.customers_per_day.append(customers)
 
     def get_best_contexts(self):
-        if len(self.customers_per_day) == 0 or self.t <= self.returns_horizon:
+        if len(self.customers_per_day) == 0:
             base_learner = self.generate_learner(self.customer_classes)
-            self.contexts.append(self.customer_classes)
-            self.learners.append(base_learner)
+            self.contexts = [self.customer_classes]
+            self.learners = [base_learner]
         else:
             base_contexts = self.contexts.copy()
             base_learners = self.learners.copy()
@@ -66,21 +66,13 @@ class PriceGreedyContextGenerator(object):
         left_learner = self.generate_learner(left_context)
         right_learner = self.generate_learner(right_context)
 
-        left_best_arm_rewards = left_learner.rewards_per_arm[left_learner.arms.index(left_learner.get_optimal_arm())]
-        right_best_arm_rewards = right_learner.rewards_per_arm[right_learner.arms.index(right_learner.get_optimal_arm())]
-
-        mu_left = self.get_hoeffding_lower_bound(np.mean(left_best_arm_rewards),
-                                                 len(left_best_arm_rewards))
-        mu_right = self.get_hoeffding_lower_bound(np.mean(right_best_arm_rewards),
-                                                 len(right_best_arm_rewards))
+        mu_left = self.get_learner_reward_lower_bound(left_learner)
+        mu_right = self.get_learner_reward_lower_bound(right_learner)
 
         return (p_left, mu_left, left_context, left_learner), (p_right, mu_right, right_context, right_learner)
 
     def get_context_best_split(self, context, learner):
-        best_arm_rewards = learner.rewards_per_arm[learner.arms.index(learner.get_optimal_arm())]
-
-        mu = self.get_hoeffding_lower_bound(np.mean(best_arm_rewards),
-                                            len(best_arm_rewards))
+        mu = self.get_learner_reward_lower_bound(learner)
 
         split = False
         learners = set()
@@ -89,6 +81,7 @@ class PriceGreedyContextGenerator(object):
             if self.is_feature_splittable(context, feature_idx):
                 (p_left, mu_left, left_context, left_learner), (p_right, mu_right, right_context, right_learner) = self.get_split_values(context, feature_idx)
                 split_value = p_left * mu_left + p_right * mu_right
+                print(mu_left, p_left, mu_right, p_right, mu)
                 if split_value > mu and split_value >= best_split_value:
                     split = True
                     best_split_value = split_value
@@ -110,7 +103,26 @@ class PriceGreedyContextGenerator(object):
     def filter_customers_by_context(self, context, customers):
         return list(filter(lambda customer: customer.customer_class in context, customers)) 
 
+    def get_learner_reward_lower_bound(self, learner):
+        best_arm_conversions = learner.collected_conversions_per_arm[learner.arms.index(learner.get_optimal_arm())]
+
+        conversion = self.get_hoeffding_lower_bound(np.mean(best_arm_conversions),
+                                                    len(best_arm_conversions))
+
+        returns_estimator = learner.returns_estimators[learner.arms.index(learner.get_optimal_arm())]
+
+        returns = self.get_chernoff_lower_bound(returns_estimator.mean(),
+                                                returns_estimator.std(),
+                                                returns_estimator.total_customers)
+
+        return conversion * learner.get_optimal_arm() * (1 + returns)
+
     def get_hoeffding_lower_bound(self, mean, cardinality):
         if cardinality == 0:
-            return -np.inf
-        return mean - np.sqrt(-np.log(self.hoeffding_confidence) / (2 * cardinality))
+            return 0
+        return mean - np.sqrt(-np.log(self.confidence) / (2 * cardinality))
+
+    def get_chernoff_lower_bound(self, mean, std, cardinality):
+        if cardinality == 0:
+            return 0
+        return mean - std * np.sqrt(-2*np.log(self.confidence) / cardinality)

@@ -62,8 +62,8 @@ class CustomerClass(object):
         returns_std = self.returns_function_params['std']
         returns_min = self.returns_function_params['min']
         returns_max = self.returns_function_params['max']
-        self.returns_function = stats.truncnorm((returns_min - returns_mean) / returns_std,
-                                                 (returns_max - returns_mean) / returns_std,
+        self.returns_function = stats.truncnorm((returns_min - 0.5 - returns_mean) / returns_std,
+                                                 (returns_max + 0.5 - returns_mean) / returns_std,
                                                  loc=returns_mean,
                                                  scale=returns_std)
 
@@ -73,6 +73,9 @@ class CustomerClass(object):
         if isinstance(other, self.__class__):
             return self.feature_values == other.feature_values and self.feature_labels == other.feature_labels
         return False
+
+    def __str__(self):
+        return str(self.feature_values)
 
     def conversion(self, price, discrete=True):
         try:
