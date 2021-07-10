@@ -12,14 +12,13 @@ objectiveFunction = ObjectiveFunction(scen, bids=bid)
 
 print(f'Bid {bid}')
 
-optimal, p1, b1 = objectiveFunction.get_optimal_no_discrimination()
+optimal, p1, b1 = objectiveFunction.get_optimal(price_discrimination=False)
 print(f'optimal price {p1}')
 print(optimal)
 
 fig, axes = plt.subplots(2)
 
-for idx, learner_class in enumerate([PriceUCBLearner, PriceTSLearner]):
-    learner_class = PriceTSLearner
+for idx, learner_class in enumerate([PriceTSLearner, PriceUCBLearner]):
     print(learner_class.__name__)
     n_exp = 2
     reward_per_experiment = [[] for _ in range(n_exp)]
@@ -42,7 +41,7 @@ for idx, learner_class in enumerate([PriceUCBLearner, PriceTSLearner]):
                 delayed_customers = customers_per_day.pop(0)
                 reward_per_experiment[exp].append(sum(list(map(lambda x: x.conversion * x.conversion_price * (1 + x.returns_count) - x.cost_per_click, delayed_customers))))
                 print(reward_per_experiment[exp][-1])
-                learner.update(customers)
+                learner.update(delayed_customers)
             print(price)
             
 
@@ -50,7 +49,7 @@ for idx, learner_class in enumerate([PriceUCBLearner, PriceTSLearner]):
 
     axes[0].plot(np.cumsum(np.mean(np.subtract(optimal, reward_per_experiment), axis=0)), 'C' + str(idx))
     axes[1].plot(np.mean(reward_per_experiment, axis=0), 'C' + str(idx))
-    axes[0].legend(['UCB', 'TS'])
-    axes[1].legend(['UCB', 'TS'])
+    axes[0].legend(['TS', 'UCB'])
+    axes[1].legend(['TS', 'UCB'])
 
 plt.show()
