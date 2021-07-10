@@ -8,9 +8,9 @@ class PriceTSLearner(PriceLearner):
         self.beta_distribution_per_arm = np.ones((len(self.arms), 2))
 
     def pull_arm(self):
-        returns_samples = np.array([estimator.rvs() for estimator in self.returns_estimators])
-        priced_samples = np.random.beta(self.beta_distribution_per_arm[:, 0], self.beta_distribution_per_arm[:, 1]) * self.arms * (1 + returns_samples)
-        return self.arms[np.random.choice(np.argwhere(priced_samples == priced_samples.max()).reshape(-1))]
+        returns_samples = np.array([estimator.sample() for estimator in self.returns_estimators])
+        reward_samples = np.random.beta(self.beta_distribution_per_arm[:, 0], self.beta_distribution_per_arm[:, 1]) * np.array(self.arms) * (1 + returns_samples)
+        return self.arms[np.random.choice(np.argwhere(reward_samples == reward_samples.max()).reshape(-1))]
  
     def update(self, customers, returns=[]):
         for customer in customers:
@@ -21,7 +21,7 @@ class PriceTSLearner(PriceLearner):
         self.update_returns(returns)
 
     def get_optimal_arm(self):
-        alpha = self.beta_distribution_per_arm[:, 0] 
+        alpha = self.beta_distribution_per_arm[:, 0]
         beta = self.beta_distribution_per_arm[:, 1]
         returns_means = np.array([estimator.mean() for estimator in self.returns_estimators])
-        return self.arms[np.argmax(alpha / (alpha + beta) * self.arms * (1 + returns_means))]
+        return self.arms[np.argmax(alpha / (alpha + beta) * np.array(self.arms) * (1 + returns_means))]

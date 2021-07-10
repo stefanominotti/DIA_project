@@ -21,8 +21,8 @@ class ReturnsEstimator(object):
         pk = [self.pdf(x) for x in xk]
         return rv_discrete(values=(xk, pk))
 
-    def rvs(self):
-        return self.estimated_function().rvs()
+    def sample(self):
+        return np.random.normal(self.mean(), self.std())
 
     def pdf(self, x): 
         if self.total_customers == 0:
@@ -33,4 +33,4 @@ class ReturnsEstimator(object):
         return self.estimated_function().mean()
 
     def std(self):
-        return self.estimated_function().std()
+        return self.estimated_function().std() / self.total_customers

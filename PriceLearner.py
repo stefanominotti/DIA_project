@@ -15,7 +15,7 @@ class PriceLearner(ABC):
     def update_observations(self, customer):
         arm_idx = self.arms.index(customer.conversion_price)
         self.total_customers += 1
-        self.samples_per_arm += 1
+        self.samples_per_arm[arm_idx] += 1
         self.collected_conversions_per_arm[arm_idx].append(customer.conversion)
         self.returns_estimators[arm_idx].new_customer(customer)
 
