@@ -22,7 +22,7 @@ class ReturnsEstimator(object):
         return rv_discrete(values=(xk, pk))
 
     def sample(self):
-        return np.random.normal(self.mean(), self.std())
+        return np.random.normal(self.mean(), self.std() / self.total_customers)
 
     def pdf(self, x): 
         if self.total_customers == 0:
@@ -33,4 +33,4 @@ class ReturnsEstimator(object):
         return self.estimated_function().mean()
 
     def std(self):
-        return self.estimated_function().std() / self.total_customers
+        return self.estimated_function().std()

@@ -5,6 +5,7 @@ from PriceTSLearner import PriceTSLearner
 from PriceUCBLearner import PriceUCBLearner
 from ObjectiveFunction import ObjectiveFunction
 from PriceGreedyContextGenerator import PriceGreedyContextGenerator
+from PriceBruteForceContextGenerator import PriceBruteForceContextGenerator
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -17,7 +18,7 @@ objectiveFunction = ObjectiveFunction(scen, bids=bid)
 
 print(f'Bid {bid}')
 
-optimal, p1, b1 = objectiveFunction.get_optimal_discrimination()
+optimal, p1, b1 = objectiveFunction.get_optimal(price_discrimination=True)
 print(f'optimal price {p1}')
 print(f'optimal {optimal}')
 
@@ -25,13 +26,13 @@ fig, axes = plt.subplots(2)
 
 for idx, learner_class in enumerate([PriceUCBLearner]):
     print(learner_class.__name__)
-    n_exp = 5
+    n_exp = 3
     reward_per_class_per_experiment = [[[] for _ in range(n_exp)] for _ in range(len(scen.customer_classes))]
 
     for exp in range(n_exp):
         print(f'Exp: {exp+1}')
         env = Environment(scen)
-        learner = ContextPriceLearner(scen.prices, learner_class, scen.features, scen.customer_classes, scen.returns_horizon, PriceGreedyContextGenerator, 20, 0.05)
+        learner = ContextPriceLearner(scen.prices, learner_class, scen.features, scen.customer_classes, scen.returns_horizon, PriceBruteForceContextGenerator, 20, 0.05)
         customers_per_day = []
 
         for day in range(scen.rounds_horizon):
