@@ -1,6 +1,9 @@
+import sys
 import numpy as np
 from abc import ABC, abstractmethod
-from ReturnsEstimator import ReturnsEstimator
+
+sys.path.append("../../")
+from utils.ReturnsEstimator import ReturnsEstimator
 
 
 class PriceLearner(ABC):
@@ -39,6 +42,6 @@ class PriceLearner(ABC):
         pass
 
     @abstractmethod
-    def get_expected_conversion_per_arm(self):
+    def get_expected_conversion_per_arm(self, arm):
         pass
     

@@ -6,17 +6,14 @@ class PriceGreedyContextGenerator(PriceContextGenerator):
     def __init__(self, features, customer_classes, learner_class, arms, returns_horizon, confidence):
         super().__init__(features, customer_classes, learner_class, arms, returns_horizon, confidence)
 
-    def get_best_contexts(self):
-        base_learner = self.generate_learner(self.customer_classes)
-        self.contexts = [self.customer_classes]
-        self.learners = [base_learner]
-
-        if len(self.customers_per_day) != 0:
+    def get_best_contexts(self, incremental=False):
+        if len(self.customers_per_day) == 0:
             base_learner = self.generate_learner(self.customer_classes)
             self.contexts = [self.customer_classes]
             self.learners = [base_learner]
-            base_contexts = self.contexts.copy()
-            base_learners = self.learners.copy()
+        else:
+            base_learners =  self.learners.copy() if incremental else self.generate_learner(self.customer_classes)
+            base_contexts = self.contexts.copy() if incremental else [self.customer_classes]
             self.contexts = []
             self.learners = []
             for idx in range(len(base_contexts)):

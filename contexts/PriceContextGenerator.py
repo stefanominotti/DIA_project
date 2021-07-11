@@ -21,7 +21,7 @@ class PriceContextGenerator(ABC):
         self.customers_per_day.append(customers)
 
     @abstractmethod
-    def get_best_contexts(self):
+    def get_best_contexts(self, incremental=False):
         pass
 
     @abstractmethod

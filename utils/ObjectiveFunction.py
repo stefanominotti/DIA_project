@@ -1,6 +1,4 @@
 import numpy as np
-import scipy.stats as stats
-import math
 
 
 class ObjectiveFunction(object):
@@ -47,7 +45,6 @@ class ObjectiveFunction(object):
             optimal_reward = np.max(rewards_per_bid)
 
         return optimal_reward, optimal_price, optimal_bid
-
 
     def get_optimal_discrimination(self):
         rewards_per_prices = []

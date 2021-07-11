@@ -1,7 +1,11 @@
+import sys
 import numpy as np
+
 from scipy.stats import binom
 from abc import ABC, abstractmethod
-from PriceTSLearner import PriceTSLearner
+
+sys.path.append("../../")
+from bandits.pricing.PriceTSLearner import PriceTSLearner
 
 
 class PriceBidLearner(ABC):
@@ -28,7 +32,7 @@ class PriceBidLearner(ABC):
 
         price_per_arm = np.array([learner.pull_arm() for learner in self.price_learner_per_arm])
         price_idx_per_arm = [self.price_learner_per_arm[idx].arms.index(price_per_arm[idx]) for idx in range(len(price_per_arm))]
-        conversion_rates_per_arm = np.array([self.price_learner_per_arm[idx].get_expected_conversion_per_arm()[price_idx_per_arm[idx]] for idx in range(len(price_idx_per_arm))])
+        conversion_rates_per_arm = np.array([self.price_learner_per_arm[idx].get_expected_conversion_per_arm(price_per_arm[idx]) for idx in range(len(price_per_arm))])
         returns_mean_per_arm = np.array([self.price_learner_per_arm[idx].returns_estimators[price_idx_per_arm[idx]].mean() for idx in range(len(price_idx_per_arm))])
 
         reward_samples = daily_clicks_samples * (conversion_rates_per_arm * price_per_arm * (1 + returns_mean_per_arm) - cost_per_click_samples)
