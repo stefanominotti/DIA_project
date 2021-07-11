@@ -1,12 +1,10 @@
 import numpy as np
 from scipy.stats import binom
-from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.gaussian_process.kernels import RBF, ConstantKernel
-from sklearn.preprocessing import StandardScaler
+from abc import ABC, abstractmethod
 from PriceTSLearner import PriceTSLearner
 
 
-class BidGPTSLearner(object):
+class PriceBidLearner(ABC):
     def __init__(self, bid_arms, price_arms, negative_probability_threshold, returns_horizon):
         self.arms = bid_arms
         self.negative_probability_threshold = negative_probability_threshold
@@ -53,39 +51,23 @@ class BidGPTSLearner(object):
         
         return valid_arms[idx], valid_prices[idx]
 
+    @abstractmethod
     def update(self, pulled_arm, customers, returns=[]):
         arm_idx = self.arms.index(pulled_arm)
         self.rounds_per_arm[arm_idx] += 1
-        self.pulled_arms.append(pulled_arm)
 
         daily_clicks = len(customers)
         costs_per_click = list(map(lambda customer: customer.cost_per_click, customers))
 
         self.collected_daily_clicks_per_arm[arm_idx].append(daily_clicks)
-        self.collected_cost_per_click_per_arm[arm_idx].append(np.mean(costs_per_click))
+        self.collected_cost_per_click_per_arm[arm_idx].extend(costs_per_click)
 
-        if len(self.pulled_arms) > 1:
-            self.daily_clicks_means, self.daily_clicks_sigmas = self.gp_regression(self.collected_daily_clicks_per_arm)
-            self.cost_per_click_means, self.cost_per_click_sigmas = self.gp_regression(self.collected_cost_per_click_per_arm)
-
+        self.cost_per_click_means[arm_idx] = np.mean(self.collected_cost_per_click_per_arm[arm_idx])
+        n_cost_per_click_samples = len(self.collected_cost_per_click_per_arm[arm_idx])
+        if n_cost_per_click_samples > 0:
+            self.cost_per_click_sigmas[arm_idx] = np.std(self.collected_cost_per_click_per_arm[arm_idx]) / n_cost_per_click_samples
+        
         self.price_learner_per_arm[arm_idx].update(customers)
-    
-    def gp_regression(self, samples_per_arm):
-        alpha = 10
-        kernel = ConstantKernel(1, (1e-3, 1e3)) * RBF(1, (1e-3, 1e3))
-        gp = GaussianProcessRegressor(kernel=kernel, alpha=alpha, normalize_y=True, n_restarts_optimizer=9)
-        scaler = StandardScaler()
-        x = []
-        y = []
-        for idx, arm in enumerate(samples_per_arm):
-            x.extend([self.arms[idx] for _ in range(len(arm))])
-            y.extend(arm)
-        x = np.atleast_2d(x).T
-        x = scaler.fit_transform(x)
-        gp.fit(x, y)
-        means, sigmas = gp.predict(scaler.transform(np.atleast_2d(self.arms).T), return_std=True)
-        sigmas = np.maximum(sigmas, 1e-2)
-        return means, sigmas
 
     def get_optimal_arm(self):
         price_per_arm = np.array([learner.get_optimal_arm() for learner in self.price_learner_per_arm])

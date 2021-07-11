@@ -116,11 +116,11 @@ class CustomerClass(object):
 
 
 class Customer(object):
-    def __init__(self, customer_class, click_bid, cost_per_click):
+    def __init__(self, customer_class, click_bid):
         self.customer_class = customer_class
         self.returns_count = 0
         self.click_bid = click_bid
-        self.cost_per_click = cost_per_click
+        self.cost_per_click = customer_class.cost_per_click(click_bid) 
 
     def convert(self, day, price):
         self.conversion = self.customer_class.conversion(price)
@@ -139,5 +139,4 @@ class SubCampaign(object):
         self.daily_clicks = [customer_class.daily_clicks(bid) for customer_class in self.customer_classes]
         self.daily_customers = []
         for customer_class_idx, customer_class in enumerate(self.customer_classes):
-            cost_per_click = customer_class.cost_per_click(bid) 
-            self.daily_customers.extend([Customer(customer_class, bid, cost_per_click) for _ in range(self.daily_clicks[customer_class_idx])])
+            self.daily_customers.extend([Customer(customer_class, bid) for _ in range(self.daily_clicks[customer_class_idx])])

@@ -1,4 +1,4 @@
-from BidGTSLearner import BidGTSLearner
+from PriceBidGTSLearner import PriceBidGTSLearner
 from ObjectiveFunction import ObjectiveFunction
 from Environment import Environment
 from Scenario import Scenario
@@ -6,7 +6,7 @@ from PriceUCBLearner import PriceUCBLearner
 from PriceTSLearner import PriceTSLearner
 from ReturnsEstimator import ReturnsEstimator
 from PriceGreedyContextGenerator import PriceGreedyContextGenerator
-from BidGPTSLearner import BidGPTSLearner
+from PriceBidGPTSLearner import PriceBidGPTSLearner
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -52,7 +52,7 @@ reward_per_experiment = [[] for _ in range(n_exp)]
 for exp in range(n_exp):
     print(f'Exp: {exp+1}')
     env = Environment(scen)
-    learner = BidGTSLearner(scen.bids, [price], 0.2, scen.returns_horizon)
+    learner = PriceBidGTSLearner(scen.bids, [price], 0.2, scen.returns_horizon)
     customers_per_day = []
     bids_per_day = []
 
