@@ -30,3 +30,6 @@ class PriceUCBLearner(PriceLearner):
     def get_optimal_arm(self):
         returns_means = np.array([estimator.mean() for estimator in self.returns_estimators])
         return self.arms[np.argmax(self.expected_conversion_per_arm * np.array(self.arms) * (1 + returns_means))]
+
+    def get_expected_conversion_per_arm(self):
+        return self.expected_conversion_per_arm.copy()

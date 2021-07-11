@@ -33,4 +33,12 @@ class PriceLearner(ABC):
     @abstractmethod
     def update(self, customers, returns=[]):
         pass
+
+    @abstractmethod
+    def get_optimal_arm(self):
+        pass
+
+    @abstractmethod
+    def get_expected_conversion_per_arm(self):
+        pass
     

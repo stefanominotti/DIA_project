@@ -21,7 +21,10 @@ class PriceTSLearner(PriceLearner):
         self.update_returns(returns)
 
     def get_optimal_arm(self):
+        returns_means = np.array([estimator.mean() for estimator in self.returns_estimators])
+        return self.arms[np.argmax(self.get_expected_conversion_per_arm() * np.array(self.arms) * (1 + returns_means))]
+
+    def get_expected_conversion_per_arm(self):
         alpha = self.beta_distribution_per_arm[:, 0]
         beta = self.beta_distribution_per_arm[:, 1]
-        returns_means = np.array([estimator.mean() for estimator in self.returns_estimators])
-        return self.arms[np.argmax(alpha / (alpha + beta) * np.array(self.arms) * (1 + returns_means))]
+        return alpha / (alpha + beta)
