@@ -24,9 +24,9 @@ print(f'optimal {optimal}')
 
 fig, axes = plt.subplots(2)
 
-for idx, learner_class in enumerate([PriceUCBLearner]):
+for idx, learner_class in enumerate([PriceTSLearner]):
     print(learner_class.__name__)
-    n_exp = 3
+    n_exp = 1
     reward_per_class_per_experiment = [[[] for _ in range(n_exp)] for _ in range(len(scen.customer_classes))]
 
     for exp in range(n_exp):
@@ -57,13 +57,8 @@ for idx, learner_class in enumerate([PriceUCBLearner]):
         print(learner.get_optimal_arm())
 
     for class_idx, customer_class in enumerate(scen.customer_classes):
-        axes[idx].plot(np.cumsum(np.mean(np.subtract(optimal[class_idx], reward_per_class_per_experiment[class_idx]), axis=0)), 'C' + str(class_idx))
+        axes[0].plot(np.cumsum(np.mean(np.subtract(optimal[class_idx], reward_per_class_per_experiment[class_idx]), axis=0)), 'C' + str(class_idx))
+        axes[1].plot(np.mean(reward_per_class_per_experiment[class_idx], axis=0), 'C' + str(class_idx))
 
-    # plt.subplot(212)
-    # plt.plot(np.mean(UCB_reward_per_experiment, axis=0), 'r')
-    # plt.plot(np.mean(TS_reward_per_experiment, axis=0), 'g')
-
-    # plt.plot(np.mean(opt_reward_per_experiment, axis=0), 'r')
-    # plt.plot(np.mean(opt2_reward_per_experiment, axis=0), 'g')
 
 plt.show()

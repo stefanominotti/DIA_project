@@ -1,8 +1,8 @@
 import numpy as np
-from ContextGenerator import ContextGenerator
+from PriceContextGenerator import PriceContextGenerator
 
 
-class PriceBruteForceContextGenerator(ContextGenerator):
+class PriceBruteForceContextGenerator(PriceContextGenerator):
     def __init__(self, features, customer_classes, learner_class, arms, returns_horizon, confidence):
         super().__init__(features, customer_classes, learner_class, arms, returns_horizon, confidence)
 
