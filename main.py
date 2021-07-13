@@ -25,22 +25,22 @@ import warnings
 warnings.filterwarnings("ignore")
 
 parser = argparse.ArgumentParser(description='DIA project experiment')  
-parser.add_argument('--exp', dest='experiment', choices=['price', 'bid', 'joint'], required=True)
-parser.add_argument('--scen', dest='scenario', required=True)
-parser.add_argument('--pd', dest='price_discrimination', default='F', choices=['F', 'T'])
-parser.add_argument('-b', dest='fixed_bid', type=float)
-parser.add_argument('-p', dest='fixed_price', type=float)
-parser.add_argument('--ne', dest='n_exp', default=1, type=int)
-parser.add_argument('--npt', dest='negative_probability_threshold', default=0.2, type=float)
-parser.add_argument('--incgen', dest='incremental_generation', default='T', choices=['F', 'T'])
-parser.add_argument('--genrate', dest='generation_rate', type=int)
-parser.add_argument('--conf', dest='confidence', default=0.5, type=float)
-parser.add_argument('--approx', dest='approximate', default='T', choices=['F', 'T'])
-parser.add_argument('-l', dest='learner_class', choices=['UCB', 'TS', 'GTS', 'GPTS'], required=True, nargs='+')
-parser.add_argument('-c', dest='contextGenerator', choices=['G', 'BF'], nargs='+')
+parser.add_argument('--exp', dest='experiment', choices=['price', 'bid', 'joint'], required=True, help='Choose if maximizing price, bid or both')
+parser.add_argument('--scen', dest='scenario', required=True, help='The scenario JSON name located in main/environments/scenarios')
+parser.add_argument('--disc', dest='price_discrimination', default='F', choices=['F', 'T'], help='Choose wether performing or not class discrimination for pricing (default F)')
+parser.add_argument('--bid', dest='fixed_bid', type=float, help='Value for the fixed bid, only if --exp is set to \'price\'')
+parser.add_argument('--price', dest='fixed_price', type=float, help='Value for the fixed price, only if --exp is set to \'bid\'')
+parser.add_argument('--ne', dest='n_exp', default=1, type=int, help='Number of experiments to perform (default 1)')
+parser.add_argument('--npt', dest='negative_probability_threshold', default=0.2, type=float, help='Reward negative probability threshold under which an arm can\'t be pulled')
+parser.add_argument('--incgen', dest='incremental_generation', default='T', choices=['F', 'T'], help='Choose wether the context generation should be incremental or not (default T), only if --disc is set to \'T\'')
+parser.add_argument('--genrate', dest='generation_rate', type=int, help='Frequency (in days) for context generation, only if --disc is set to \'T\'')
+parser.add_argument('--conf', dest='confidence', default=0.05, type=float, help='Confidence for Hoeffding lower bound in context generation (default 0.05), only if --disc is set to \'T\'')
+parser.add_argument('--approx', dest='approximate', default='T', choices=['F', 'T'], help='Choose wether the joint algorithm should be approximated or not, only if --exp is set to \'joint\'')
+parser.add_argument('--learners', dest='learner_class', choices=['UCB', 'TS', 'GTS', 'GPTS'], required=True, nargs='+', help='Select the learners to use, \'UCB\' and \'TS\' can be selected only if --exp is set to \'price\'; \'GTS\' and \'GPTS\' can be selectedn only if --exp is set to \'bid\' or \'joint\'')
+parser.add_argument('--cgens', dest='contextGenerator', choices=['G', 'BF'], nargs='+', help='Choose the type of context generation between Greedy and Brute-force or both, only if --disc is set to \'T\'')
 args = parser.parse_args()
 
-# Transfor boolean variables from string to bool
+# Transform boolean variables from string to bool
 price_discrimination = True if args.price_discrimination == 'T' else False
 incremental_generation = True if args.incremental_generation == 'T' else False
 approximate = True if args.approximate == 'T' else False
@@ -50,7 +50,7 @@ if not args.scenario + '.json' in os.listdir('main/environment/scenarios'):
     raise Exception("Scenario doesn't exists")
 scenario = Scenario(args.scenario)
 
-# Check if fixed bid and price are in scenrario
+# Check if fixed bid and price are in scenario
 if (args.fixed_bid and not args.fixed_bid in scenario.bids) or \
     (args.fixed_price and not args.fixed_price in scenario.prices):
     raise Exception('Invalid bid or price')
