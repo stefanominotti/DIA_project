@@ -1,7 +1,7 @@
 {
     "prices": [0.5,1,1.5,2,2.5,3,3.5,4,4.5,5], 
     "bids": [0.8,1.6,2.4,3.2,4,4.8,5.6,6.4,7.2,8],
-    "rounds_horizon": 395,
+    "rounds_horizon": 365,
     "returns_horizon": 30,
     "features": ["under 30", "sporty"],
     "customer_classes": [
