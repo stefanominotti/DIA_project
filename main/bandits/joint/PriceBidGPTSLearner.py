@@ -29,19 +29,17 @@ class PriceBidGPTSLearner(object):
                     self.daily_clicks_means, self.daily_clicks_sigmas = self.gp_regression(self.collected_daily_clicks_per_arm)
                 
             def gp_regression(self, samples_per_arm):
-                alpha = 0.05
-                kernel = ConstantKernel(1, (1e-3, 1e3)) * RBF(1, (1e-3, 1e3))
-                gp = GaussianProcessRegressor(kernel=kernel, alpha=alpha, normalize_y=True, n_restarts_optimizer=9)
-                scaler = StandardScaler()
+                alpha = 0.1
+                kernel = ConstantKernel(1.0, (1e-3, 1e3)) * RBF(1.0, (1e-3, 1e3))
+                gp = GaussianProcessRegressor(kernel=kernel, alpha=alpha, n_restarts_optimizer=10)
                 x = []
                 y = []
                 for idx, arm in enumerate(samples_per_arm):
                     x.extend([self.arms[idx] for _ in range(len(arm))])
                     y.extend(arm)
                 x = np.atleast_2d(x).T
-                x_ = scaler.fit_transform(x)
-                gp.fit(x_, y)
-                means, sigmas = gp.predict(scaler.transform(np.atleast_2d(self.arms).T), return_std=True)
+                gp.fit(x, y)
+                means, sigmas = gp.predict(np.atleast_2d(self.arms).T, return_std=True)
                 sigmas = np.maximum(sigmas, 1e-2) 
                 samples_per_arm = np.array(samples_per_arm)
                 #plt.figure()
