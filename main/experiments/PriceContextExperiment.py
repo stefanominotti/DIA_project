@@ -27,14 +27,18 @@ class PriceContextExperiment(Experiment):
                                           self.incremental_generation)
             customers_per_day = []
 
-            for day in range(self.scen.rounds_horizon):
+            for day in range(self.scen.rounds_horizon + self.scen.returns_horizon):
+
+                self.printProgressBar(day + 1, self.scen.rounds_horizon + self.scen.returns_horizon, prefix='Exp: '+str(exp+1)+' - Progress:', suffix='Complete', length=50)
+                
                 contexts, prices_per_context, prices_per_class = learner.pull_arm()
                 customers, returns = env.round(self.fixed_bid, prices_per_class)
                 customers_per_day.append(customers)
 
-                if day > 30:
+                if day > self.scen.returns_horizon:
                     delayed_customers = customers_per_day.pop(0)
-                    learner.update(delayed_customers)
+                    if day < self.scen.rounds_horizon + self.scen.returns_horizon:
+                        learner.update(delayed_customers)
                     for class_idx, customer_class in enumerate(self.scen.customer_classes):
                         class_customers = list(filter(lambda customer: customer.customer_class == customer_class, delayed_customers))
                         self.reward_per_experiment[class_idx][exp].append(

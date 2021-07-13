@@ -21,7 +21,10 @@ class JointExperiment(Experiment):
             prices_per_day = []
             bids_per_day = []
 
-            for day in range(self.scen.rounds_horizon):
+            for day in range(self.scen.rounds_horizon + self.scen.returns_horizon):
+
+                self.printProgressBar(day + 1, self.scen.rounds_horizon + self.scen.returns_horizon, prefix='Exp: '+str(exp+1)+' - Progress:', suffix='Complete', length=50)
+                
                 bid, price = learner.pull_arm()
                 customers, returns = env.round([bid], [price, price, price])
                 customers_per_day.append(customers)
@@ -32,7 +35,8 @@ class JointExperiment(Experiment):
                 if day > self.scen.returns_horizon:
                     delayed_customers = customers_per_day.pop(0)
                     bid = bids_per_day.pop(0)
-                    learner.update(bid, delayed_customers)
+                    if day < self.scen.rounds_horizon + self.scen.returns_horizon:
+                        learner.update(bid, delayed_customers)
                     reward = 0
                     converted_customers = list(filter(lambda customer: customer.conversion == 1, delayed_customers))
                     reward += sum(list(map(lambda customer: customer.conversion_price * (1 + customer.returns_count), converted_customers)))
