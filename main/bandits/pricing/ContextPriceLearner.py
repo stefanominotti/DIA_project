@@ -1,3 +1,5 @@
+import numpy as np
+
 class ContextPriceLearner(object):
     def __init__(self, arms, learner_class, features, customer_classes, returns_horizon, context_generator_class, context_generation_rate, confidence, incremental_generation):
         self.day = 0
@@ -27,7 +29,7 @@ class ContextPriceLearner(object):
             self.contexts, self.learners = self.context_generator.get_best_contexts(self.incremental_generation)
 
     def get_optimal_arm(self):
-        return [learner.get_optimal_arm() for learner in self.learners]
+        return np.array([learner.get_optimal_arm() for learner in self.learners])
 
     def get_optimal_arm_per_class(self):
         prices_per_context = [learner.get_optimal_arm() for learner in self.learners]
@@ -38,11 +40,13 @@ class ContextPriceLearner(object):
         return prices_per_class
 
     def get_expected_conversion_per_arm(self, arm_per_context):
-        return [learner.get_expected_conversion_per_arm(arm_per_context[idx]) for idx, learner in enumerate(self.learners)]
+        return np.array([learner.get_expected_conversion_per_arm(arm_per_context[idx]) for idx, learner in enumerate(self.learners)])
 
     def get_expected_return_per_arm(self, arm_per_context):
-        return [learner.returns_estimators[self.arms.index(arm_per_context[idx])].mean() for idx, learner in enumerate(self.learners)]
+        return np.array([learner.returns_estimators[self.arms.index(arm_per_context[idx])].mean() for idx, learner in enumerate(self.learners)])
 
     def get_contexts_weights(self):
         total_customers = sum(list(map(lambda learner: learner.total_customers, self.learners)))
-        return [learner.total_customers / total_customers for learner in self.learners]
+        if total_customers == 0:
+            return 0
+        return np.array([learner.total_customers / total_customers for learner in self.learners])

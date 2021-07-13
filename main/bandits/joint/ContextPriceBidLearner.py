@@ -71,11 +71,11 @@ class ContextPriceBidLearner(PriceBidLearner):
         return valid_arms[idx], valid_contexts_per_arm[idx], valid_price_per_context_per_arm[idx], valid_price_per_class_per_arm[idx]
 
     def get_optimal_arm(self):
-        price_per_context_per_arm = [learner.get_optimal_arm() for learner in self.price_learner_per_arm]
+        price_per_context_per_arm = np.array([learner.get_optimal_arm() for learner in self.price_learner_per_arm])
         conversion_rates_per_context_per_arm = np.array([self.price_learner_per_arm[idx].get_expected_conversion_per_arm(price_per_context_per_arm[idx]) for idx in range(len(price_per_context_per_arm))])
         returns_mean_per_context_per_arm = np.array([self.price_learner_per_arm[idx].get_expected_return_per_arm(price_per_context_per_arm[idx]) for idx in range(len(price_per_context_per_arm))])
         context_weights_per_arm = np.array([price_learner.get_contexts_weights() for price_learner in self.price_learner_per_arm])
-        daily_clicks_means = np.array(list(map(lambda x: [x], self.daily_clicks_means)))
-        cost_per_click_means = np.array(list(map(lambda x: [x], self.cost_per_click_means)))
-        rewards = daily_clicks_means * (context_weights_per_arm * conversion_rates_per_context_per_arm * price_per_context_per_arm * (1 + returns_mean_per_context_per_arm) - cost_per_click_means)
-        return (self.price_learner_per_arm[np.argmax(rewards)].get_optimal_arm_per_class(), self.arms[np.argmax(np.argmax(rewards))])
+        weighted_price_reward_per_context_per_arm = context_weights_per_arm * conversion_rates_per_context_per_arm * price_per_context_per_arm * (1 + returns_mean_per_context_per_arm)
+        weighted_price_reward_per_arm = [x.sum() for x in weighted_price_reward_per_context_per_arm]
+        rewards = self.daily_clicks_means * (weighted_price_reward_per_arm - self.cost_per_click_means)
+        return (self.price_learner_per_arm[np.argmax(rewards)].get_optimal_arm_per_class(), self.arms[np.argmax(rewards)])
