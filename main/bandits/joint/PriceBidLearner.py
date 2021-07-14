@@ -7,7 +7,22 @@ from main.bandits.pricing.PriceTSLearner import PriceTSLearner
 
 
 class PriceBidLearner(ABC):
+    """
+    Abstract class for a bandit learner for joint pricing and bidding,
+    if a single price is provided it works as bid learner with fixed price
+    """
+
     def __init__(self, bid_arms, price_arms, negative_probability_threshold, returns_horizon, approximate=False):
+        """Class constructor
+
+        Args:
+            bid_arms (list): list of possible bids
+            price_arms (list): list of possible prices
+            negative_probability_threshold ([type]): reward negative probability threshold under which an arm can't be pulled
+            returns_horizon (integer): days horizon during which a customer can return to purchase after the first time
+            approximate (bool, optional): choose wether considering pricing problem as disjoint from bidding problem. Defaults to False.
+        """
+
         self.arms = bid_arms
         self.negative_probability_threshold = negative_probability_threshold
         self.pulled_arms = []
@@ -25,6 +40,15 @@ class PriceBidLearner(ABC):
             self.price_learner_per_arm = [PriceTSLearner(price_arms, returns_horizon) for _ in range(len(self.arms))]
 
     def pull_arm(self):
+        """Pull an arm
+
+        Raises:
+            Exception: all the arms exceed negative threshold
+
+        Returns:
+            tuple: tuple of bid and price
+        """
+
         if len(np.argwhere(self.rounds_per_arm == 0)) != 0:
             idx = np.random.choice(np.argwhere(self.rounds_per_arm == 0).reshape(-1))
             return self.arms[idx], self.price_learner_per_arm[idx].pull_arm()
@@ -58,7 +82,14 @@ class PriceBidLearner(ABC):
         return valid_arms[idx], valid_prices[idx]
 
     @abstractmethod
-    def update(self, pulled_arm, customers, returns=[]):
+    def update(self, pulled_arm, customers):
+        """Update the estimations given a set of daily customers
+
+        Args:
+            pulled_arm (float): the daily pulled bid
+            customers (list): the daily customers
+        """
+
         arm_idx = self.arms.index(pulled_arm)
         self.rounds_per_arm[arm_idx] += 1
         self.pulled_arms.append(pulled_arm)
@@ -77,6 +108,12 @@ class PriceBidLearner(ABC):
         self.price_learner_per_arm[arm_idx].update(customers)
 
     def get_optimal_arm(self):
+        """Get the actual optimal arm
+
+        Returns:
+            tuple: tuple of optimal price and bid
+        """
+
         price_per_arm = np.array([learner.get_optimal_arm() for learner in self.price_learner_per_arm])
         price_idx_per_arm = [self.price_learner_per_arm[idx].arms.index(price_per_arm[idx]) for idx in range(len(price_per_arm))]
         conversion_rates_per_arm = np.array([self.price_learner_per_arm[idx].get_expected_conversion_per_arm()[price_idx_per_arm[idx]] for idx in range(len(price_idx_per_arm))])
