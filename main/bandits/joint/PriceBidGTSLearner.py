@@ -18,8 +18,8 @@ class PriceBidGTSLearner(object):
                 else:
                     super().__init__(bid_arms, price_arms, negative_probability_threshold, returns_horizon, approximate)
 
-            def update(self, pulled_arm, customers, returns=[]):
-                super().update(pulled_arm, customers, returns=returns)
+            def update(self, pulled_arm, customers):
+                super().update(pulled_arm, customers)
 
                 arm_idx = self.arms.index(pulled_arm)
 
@@ -33,8 +33,8 @@ class PriceBidGTSLearner(object):
     def pull_arm(self):
         return self.learner.pull_arm()
 
-    def update(self, pulled_arm, customers, returns=[]):
-        self.learner.update(pulled_arm, customers, returns)
+    def update(self, pulled_arm, customers):
+        self.learner.update(pulled_arm, customers)
 
     def get_optimal_arm(self):
         return self.learner.get_optimal_arm()

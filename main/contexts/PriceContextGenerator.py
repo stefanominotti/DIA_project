@@ -33,7 +33,7 @@ class PriceContextGenerator(ABC):
         for daily_customers in self.customers_per_day:
             customers = self.filter_customers_by_context(context, daily_customers)
             if len(customers) > 0:
-                learner.update(customers, [])
+                learner.update(customers)
         return learner
     
     def filter_customers_by_context(self, context, customers):
