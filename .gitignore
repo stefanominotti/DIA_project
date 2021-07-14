@@ -115,4 +115,4 @@ dmypy.json
 
 # VSCode
 .vscode/*
-img/
+img/*
