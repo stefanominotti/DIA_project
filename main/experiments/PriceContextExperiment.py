@@ -45,9 +45,10 @@ class PriceContextExperiment(Experiment):
                             sum(list(map(
                                 lambda x: x.conversion * x.conversion_price * (1 + x.returns_count) - x.cost_per_click, 
                                 class_customers))))
-            contexts_result = [('' if customer_class.feature_values[0] else 'not ') + customer_class.feature_labels[0] + \
+            contexts_result = [[('' if customer_class.feature_values[0] else 'not ') + customer_class.feature_labels[0] + \
                                       (' & ' if customer_class.feature_values[1] else ' & not ') + customer_class.feature_labels[1] \
-                                          for context in contexts for customer_class in context]
+                                          for customer_class in context] 
+                                          for context in contexts]
             optimal_arms.append((contexts_result, learner.get_optimal_arm_per_class()))
         return optimal_arms
             

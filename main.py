@@ -118,6 +118,7 @@ for learner_class in learner_classes:
     for kwargs in kwargs_list:
         learner_name = list(learner_class_map.keys())[list(learner_class_map.values()).index(learner_class)]
         context_generator_name = '-'+list(context_generator_map.keys())[list(context_generator_map.values()).index(kwargs['contextGenerator'])] if price_discrimination else ''
+        print(learner_name + context_generator_name)
         exp = experiment(scenario=scenario,
                          learner_class=learner_class,
                          price_discrimination= price_discrimination,
@@ -126,7 +127,10 @@ for learner_class in learner_classes:
                          n_exp=args.n_exp,
                          **kwargs)
         optimal_arms = exp.run()
-        print(learner_name + context_generator_name, optimal_arms)
+        incgen_string = '-inc' if (price_discrimination and incremental_generation) else ''
+        approx_string = '-approx' if (approximate and args.experiment == 'joint') else ''
+        exp.save_results(args.experiment + '-' + learner_name + context_generator_name + incgen_string + approx_string, optimal_arms)
+        print(optimal_arms)
         exp.print_optimal()
         exp.plot(axes, 
                  color='C'+str(color_idx if color_idx < 3 else color_idx+1), 

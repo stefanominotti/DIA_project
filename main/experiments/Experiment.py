@@ -1,10 +1,12 @@
-from math import remainder
+import os
+import json
 import numpy as np
+from abc import ABC, abstractmethod
 
 from main.utils.ObjectiveFunction import ObjectiveFunction
 
 
-class Experiment(object):
+class Experiment(ABC):
     def __init__(self, scenario, learner_class, price_discrimination, fixed_bid=None, fixed_price=None, n_exp=1):
         self.scen = scenario
         self.learner_class = learner_class
@@ -16,6 +18,10 @@ class Experiment(object):
         self.optimal, self.price, self.bid = self.objectiveFunction.get_optimal(self.price_discrimination)
         self.reward_per_experiment = []
 
+    @abstractmethod
+    def run():
+        pass
+
     def plot(self, axes, color, label):
         if len(self.reward_per_experiment) > 1:
             for idx in range(len(self.reward_per_experiment)):
@@ -26,7 +32,7 @@ class Experiment(object):
                                       (' & ' if customer_class.feature_values[1] else ' & not ') + customer_class.feature_labels[1])
                 axes[0,0].set_ylabel('Regret')   
                 axes[1,idx].set_xlabel('Days') 
-                axes[1,0].set_ylabel('Daily reward') 
+                axes[1,0].set_ylabel('Daily reward')
         else:
             for idx in range(len(self.reward_per_experiment)):
                 axes[0].plot(np.cumsum(np.mean(np.subtract(self.optimal[idx], self.reward_per_experiment[idx]), axis=0)), color=color, label=label)
@@ -38,7 +44,28 @@ class Experiment(object):
     def print_optimal(self):
         print(f'optimal reward: {self.optimal}')
         print(f'fixed price: {self.fixed_price}' if self.fixed_price else f'optimal price: {self.price}') 
-        print(f'fixed bid: {self.fixed_bid}' if self.fixed_bid else f'optimal bid: {self.bid}') 
+        print(f'fixed bid: {self.fixed_bid}' if self.fixed_bid else f'optimal bid: {self.bid}')
+
+    def save_results(self, exp_name, optimal_arms):
+        class NumpyEncoder(json.JSONEncoder):
+            def default(self, obj):
+                if isinstance(obj, np.ndarray):
+                    return obj.tolist()
+                return json.JSONEncoder.default(self, obj)
+
+        if not os.path.exists('results'):
+            os.mkdir('results')
+        
+        result = {
+            'optimal': self.optimal,
+            'price':  self.price,
+            'bid': self.bid,
+            'rewards': self.reward_per_experiment,
+            'optimal_arms': optimal_arms
+        }
+
+        with open('results/'+exp_name+'.json', 'w') as f:
+            json.dump(result, f, cls=NumpyEncoder, indent=2)
 
     def printProgressBar(self, iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
         """
