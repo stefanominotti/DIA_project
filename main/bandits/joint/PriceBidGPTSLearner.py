@@ -20,7 +20,7 @@ class PriceBidGPTSLearner(object):
         Args:
             bid_arms (list): list of possible bids
             price_arms (list): list of possible prices
-            negative_probability_threshold ([type]): reward negative probability threshold under which an arm can't be pulled
+            negative_probability_threshold (float): reward negative probability threshold under which an arm can't be pulled
             returns_horizon (integer): days horizon during which a customer can return to purchase after the first time
             price_discrimination (bool, optional): choose wether performing price discrimination. Defaults to False.
             features (list, optional): list of features for splitting contexts. Defaults to None.
@@ -40,7 +40,7 @@ class PriceBidGPTSLearner(object):
         Args:
             bid_arms (list): list of possible bids
             price_arms (list): list of possible prices
-            negative_probability_threshold ([type]): reward negative probability threshold under which an arm can't be pulled
+            negative_probability_threshold (float): reward negative probability threshold under which an arm can't be pulled
             returns_horizon (integer): days horizon during which a customer can return to purchase after the first time
             price_discrimination (bool, optional): choose wether performing price discrimination. Defaults to False.
             features (list, optional): list of features for splitting contexts. Defaults to None.

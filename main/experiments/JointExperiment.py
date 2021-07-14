@@ -3,13 +3,30 @@ from main.environment.Environment import Environment
 
 
 class JointExperiment(Experiment):
+    """
+    Class representing an experiment of joint bidding and pricing
+    """
+
     def __init__(self, negative_probability_threshold, approximate, **kwargs):
+        """Class constructor
+
+        Args:
+            negative_probability_threshold (float): reward negative probability threshold under which an arm can't be pulled
+            approximate (bool): choose wether considering pricing problem as disjoint from bidding problem
+        """
+
         super().__init__(**kwargs)
         self.negative_probability_threshold = negative_probability_threshold
         self.approximate = approximate
         self.reward_per_experiment = [[[] for _ in range(self.n_exp)]]
 
     def run(self):
+        """Run the experiment
+
+        Returns:
+            list: list of optimal arms for each iteration
+        """
+        
         optimal_arms = []
         for exp in range(self.n_exp):
             env = Environment(self.scen)

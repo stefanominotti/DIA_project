@@ -7,7 +7,22 @@ from main.utils.ObjectiveFunction import ObjectiveFunction
 
 
 class Experiment(ABC):
+    """
+    Abstract class representing an experiment
+    """
+    
     def __init__(self, scenario, learner_class, price_discrimination, fixed_bid=None, fixed_price=None, n_exp=1):
+        """Class constructor
+
+        Args:
+            scenario (Scenario): object representing the scenario
+            learner_class (PriceLearner/PriceBidGTSLearner/PriceBidGPTSLearner): type of learner used
+            price_discrimination (boolean): choose wether performing price discrimination
+            fixed_bid (float, optional): bid if bid is fixed. Defaults to None.
+            fixed_price (float, optional): price if bid is fixed. Defaults to None.
+            n_exp (int, optional): number of iterations to perform. Defaults to 1.
+        """
+
         self.scen = scenario
         self.learner_class = learner_class
         self.price_discrimination = price_discrimination
@@ -20,9 +35,21 @@ class Experiment(ABC):
 
     @abstractmethod
     def run():
+        """
+        Run the experiment
+        """
+
         pass
 
     def plot(self, axes, color, label):
+        """Plot daily regret and daily reward
+
+        Args:
+            axes (list): list of axes on which plotting
+            color (string): color for the plotted lines
+            label (string): curve identifier in the legend
+        """
+
         if len(self.reward_per_experiment) > 1:
             for idx in range(len(self.reward_per_experiment)):
                 axes[0,idx].plot(np.cumsum(np.mean(np.subtract(self.optimal[idx], self.reward_per_experiment[idx]), axis=0)), color=color, label=label)
@@ -42,11 +69,22 @@ class Experiment(ABC):
                 axes[1].set_xlabel('Days')   
 
     def print_optimal(self):
+        """
+        Print optimal reward, price and bid for the chosen problem
+        """
+
         print(f'optimal reward: {self.optimal}')
         print(f'fixed price: {self.fixed_price}' if self.fixed_price else f'optimal price: {self.price}') 
         print(f'fixed bid: {self.fixed_bid}' if self.fixed_bid else f'optimal bid: {self.bid}')
 
     def save_results(self, exp_name, optimal_arms):
+        """Store the results on a file
+
+        Args:
+            exp_name (string): name to give to the file
+            optimal_arms (list): list of optimal arms to store
+        """
+
         class NumpyEncoder(json.JSONEncoder):
             def default(self, obj):
                 if isinstance(obj, np.ndarray):
@@ -72,18 +110,19 @@ class Experiment(ABC):
             json.dump(result, f, cls=NumpyEncoder, indent=2)
 
     def printProgressBar(self, iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
+        """Call in a loop to create terminal progress bar
+
+        Args:
+            iteration (integer): current iteration
+            total (integer): total iterations
+            prefix (string, optional): prefix string. Defaults to ''.
+            suffix (string, optional): suffix string. Defaults to ''.
+            decimals (integer, optional): positive number of decimals in percent complete. Defaults to 1.
+            length (integer, optional): character length of bar. Defaults to 100.
+            fill (string, optional): bar fill character. Defaults to '█'.
+            printEnd (string, optional): end character (e.g. "\r", "\r\n"). Defaults to "\r".
         """
-        Call in a loop to create terminal progress bar
-        @params:
-            iteration   - Required  : current iteration (Int)
-            total       - Required  : total iterations (Int)
-            prefix      - Optional  : prefix string (Str)
-            suffix      - Optional  : suffix string (Str)
-            decimals    - Optional  : positive number of decimals in percent complete (Int)
-            length      - Optional  : character length of bar (Int)
-            fill        - Optional  : bar fill character (Str)
-            printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
-        """
+
         percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
         filledLength = int(length * iteration // total)
         bar = fill * filledLength + '-' * (length - filledLength)
@@ -91,6 +130,5 @@ class Experiment(ABC):
         # Print New Line on Complete
         if iteration == total: 
             print()
-
 
 

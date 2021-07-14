@@ -18,7 +18,7 @@ class ContextPriceBidLearner(PriceBidLearner):
         Args:
             bid_arms (list): list of possible bids
             price_arms (list): list of possible prices
-            negative_probability_threshold ([type]): reward negative probability threshold under which an arm can't be pulled
+            negative_probability_threshold (float): reward negative probability threshold under which an arm can't be pulled
             returns_horizon (integer): days horizon during which a customer can return to purchase after the first time
             features (list): list of features for splitting contexts
             customer_classes (list): list of customer classes

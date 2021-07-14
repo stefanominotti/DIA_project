@@ -2,12 +2,33 @@ import numpy as np
 
 
 class ObjectiveFunction(object):
+    """
+    Class used to simulate the objective function
+    """
+
     def __init__(self, scenario, prices=None, bids=None):
+        """Class constructor
+
+        Args:
+            scenario (Scenario): the class representing the scenario
+            prices (list, optional): list of prices on which performing optimization. Defaults to None.
+            bids (list, optional): list of bids on which performing optimization. Defaults to None.
+        """
+
         self.scen = scenario
         self.prices = prices if prices != None else self.scen.prices
         self.bids = bids if bids != None else self.scen.bids
 
     def get_optimal(self, price_discrimination=False):
+        """Get the optimal bid and price with or without price discrimination
+
+        Args:
+            price_discrimination (bool, optional): wether or not discrimination for pricing. Defaults to False.
+
+        Returns:
+            tuple: tuplo containg optimal reward(s), optimal price(s) and optimal bid
+        """
+
         returns_per_class = np.array([sum([x*(customer_class.returns_function.cdf(x+0.5) - customer_class.returns_function.cdf(x-0.5)) for x in range(self.scen.returns_horizon + 1)]) for customer_class in self.scen.customer_classes])
         optimal_price_per_bid = []
         rewards_per_bid_per_class = []

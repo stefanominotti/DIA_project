@@ -3,11 +3,25 @@ from main.environment.Environment import Environment
 
 
 class PriceExperiment(Experiment):
+    """
+    Class representing an experiment of pricing with fixed bid
+    """
+
     def __init__(self, **kwargs):
+        """
+        Class constructor
+        """
+
         super().__init__(**kwargs)
         self.reward_per_experiment = [[[] for _ in range(self.n_exp)]]
 
     def run(self):
+        """Run the experiment
+
+        Returns:
+            list: list of optimal arms for each iteration
+        """
+        
         optimal_arms = []
         for exp in range(self.n_exp):
             env = Environment(self.scen)
