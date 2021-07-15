@@ -17,7 +17,7 @@ class ContextPriceLearner(object):
             context_generator_class (PriceContextGenerator): type of context generator used
             context_generation_rate (integer): rate in days for context generation
             confidence (float): Hoeffding confidence
-            incremental_generation (bool): choose wether generation is incremental or from scratch
+            incremental_generation (bool): choose whether generation is incremental or from scratch
         """
 
         self.day = 0

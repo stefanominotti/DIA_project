@@ -25,8 +25,8 @@ class ContextPriceBidLearner(PriceBidLearner):
             context_generator_class (PriceContextGenerator): type of context generator used
             context_generation_rate (integer): rate in days for context generation
             confidence (float): Hoeffding confidence
-            incremental_generation (bool): choose wether generation is incremental or from scratch
-            approximate (bool, optional): choose wether considering pricing problem as disjoint from bidding problem
+            incremental_generation (bool): choose whether generation is incremental or from scratch
+            approximate (bool, optional): choose whether considering pricing problem as disjoint from bidding problem
         """
 
         super().__init__(bid_arms, price_arms, negative_probability_threshold, returns_horizon, approximate)

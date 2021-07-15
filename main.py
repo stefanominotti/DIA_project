@@ -27,23 +27,25 @@ warnings.filterwarnings("ignore")
 parser = argparse.ArgumentParser(description='DIA project experiment')  
 parser.add_argument('--exp', dest='experiment', choices=['price', 'bid', 'joint'], required=True, help='Choose if maximizing price, bid or both')
 parser.add_argument('--scen', dest='scenario', required=True, help='The scenario JSON name located in main/environments/scenarios')
-parser.add_argument('--disc', dest='price_discrimination', default='F', choices=['F', 'T'], help='Choose wether performing or not class discrimination for pricing (default F)')
+parser.add_argument('--disc', dest='price_discrimination', default='F', choices=['F', 'T'], help='Choose whether performing or not class discrimination for pricing (default F)')
 parser.add_argument('--bid', dest='fixed_bid', type=float, help='Value for the fixed bid, only if --exp is set to \'price\'')
 parser.add_argument('--price', dest='fixed_price', type=float, help='Value for the fixed price, only if --exp is set to \'bid\'')
 parser.add_argument('--ne', dest='n_exp', default=1, type=int, help='Number of iterations of the experiment to perform, the daily results will be averaged (default 1)')
 parser.add_argument('--npt', dest='negative_probability_threshold', default=0.2, type=float, help='Reward negative probability threshold under which an arm can\'t be pulled (default 0.2)')
-parser.add_argument('--incgen', dest='incremental_generation', default='T', choices=['F', 'T'], help='Choose wether the context generation should be incremental or not (default T), only if --disc is set to \'T\'')
+parser.add_argument('--incgen', dest='incremental_generation', default='T', choices=['F', 'T'], help='Choose whether the context generation should be incremental or not (default T), only if --disc is set to \'T\'')
 parser.add_argument('--genrate', dest='generation_rate', type=int, help='Frequency (in days) for context generation, only if --disc is set to \'T\'')
 parser.add_argument('--conf', dest='confidence', default=0.05, type=float, help='Confidence for Hoeffding lower bound in context generation (default 0.05), only if --disc is set to \'T\'')
-parser.add_argument('--approx', dest='approximate', default='T', choices=['F', 'T'], help='Choose wether the joint algorithm should be approximated or not (default \'T\'), only if --exp is set to \'joint\'')
+parser.add_argument('--approx', dest='approximate', default='T', choices=['F', 'T'], help='Choose whether the joint algorithm should be approximated or not (default \'T\'), only if --exp is set to \'joint\'')
 parser.add_argument('--learners', dest='learner_class', choices=['UCB', 'TS', 'GTS', 'GPTS'], required=True, nargs='+', help='Select the learners to use, \'UCB\' and \'TS\' can be selected only if --exp is set to \'price\'; \'GTS\' and \'GPTS\' can be selectedn only if --exp is set to \'bid\' or \'joint\'')
 parser.add_argument('--cgens', dest='contextGenerator', choices=['G', 'BF'], nargs='+', help='Choose the type of context generation between Greedy and Brute-force or both, only if --disc is set to \'T\'')
+parser.add_argument('--save', dest='save', default='F', choices=['T', 'F'], help='Choose whether to save or not the results as JSON file')
 args = parser.parse_args()
 
 # Transform boolean variables from string to bool
 price_discrimination = True if args.price_discrimination == 'T' else False
 incremental_generation = True if args.incremental_generation == 'T' else False
 approximate = True if args.approximate == 'T' else False
+save = True if args.save == 'T' else False
 
 # Check and load scenario
 if not args.scenario + '.json' in os.listdir('main/environment/scenarios'):
@@ -129,7 +131,8 @@ for learner_class in learner_classes:
         optimal_arms = exp.run()
         incgen_string = '-inc' if (price_discrimination and incremental_generation) else ''
         approx_string = '-approx' if (approximate and args.experiment == 'joint') else ''
-        exp.save_results(args.experiment + '-' + learner_name + context_generator_name + incgen_string + approx_string, optimal_arms)
+        if save:
+            exp.save_results(args.experiment + '-' + learner_name + context_generator_name + incgen_string + approx_string, optimal_arms)
         print(optimal_arms)
         exp.print_optimal()
         exp.plot(axes, 

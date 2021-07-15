@@ -134,7 +134,7 @@ class CustomerClass(object):
 
         Args:
             price (float): the price at which evaluating the function
-            discrete (bool, optional): choose wether returning a probability or a sample (0, 1). Defaults to True.
+            discrete (bool, optional): choose whether returning a probability or a sample (0, 1). Defaults to True.
 
         Raises:
             Exception: missing parameter for conversion function
@@ -158,7 +158,7 @@ class CustomerClass(object):
 
         Args:
             bid (bool): the bid at which evaluating the function
-            noise (bool, optional): choose wether adding noise or not. Defaults to True.
+            noise (bool, optional): choose whether adding noise or not. Defaults to True.
 
         Raises:
             Exception: missing parameter for daily clicks function
@@ -183,7 +183,7 @@ class CustomerClass(object):
 
         Args:
             bid (bool): the bid at which evaluating the function
-            noise (bool, optional): choose wether adding noise or not. Defaults to True.
+            noise (bool, optional): choose whether adding noise or not. Defaults to True.
 
         Raises:
             Exception: missing parameter for cost per click function

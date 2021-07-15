@@ -17,14 +17,14 @@ class PriceBidGTSLearner(object):
             price_arms (list): list of possible prices
             negative_probability_threshold (float): reward negative probability threshold under which an arm can't be pulled
             returns_horizon (integer): days horizon during which a customer can return to purchase after the first time
-            price_discrimination (bool, optional): choose wether performing price discrimination. Defaults to False.
+            price_discrimination (bool, optional): choose whether performing price discrimination. Defaults to False.
             features (list, optional): list of features for splitting contexts. Defaults to None.
             customer_classes (list, optional): list of customer classes. Defaults to None.
             context_generator_class (PriceContextGenerator, optional): type of context generator used. Defaults to None.
             context_generation_rate (integer, optional): rate in days for context generation. Defaults to None.
             confidence (float, optional): Hoeffding confidence. Defaults to None.
-            incremental_generation (bool, optional): choose wether generation is incremental or from scratch. Defaults to None.
-            approximate (bool, optional): choose wether considering pricing problem as disjoint from bidding problem. Defaults to None.
+            incremental_generation (bool, optional): choose whether generation is incremental or from scratch. Defaults to None.
+            approximate (bool, optional): choose whether considering pricing problem as disjoint from bidding problem. Defaults to None.
         """
 
         self.learner = self.get_learner(bid_arms, price_arms, negative_probability_threshold, returns_horizon, price_discrimination, features, customer_classes, context_generator_class, context_generation_rate, confidence, incremental_generation, approximate)
@@ -37,14 +37,14 @@ class PriceBidGTSLearner(object):
             price_arms (list): list of possible prices
             negative_probability_threshold (float): reward negative probability threshold under which an arm can't be pulled
             returns_horizon (integer): days horizon during which a customer can return to purchase after the first time
-            price_discrimination (bool, optional): choose wether performing price discrimination. Defaults to False.
+            price_discrimination (bool, optional): choose whether performing price discrimination. Defaults to False.
             features (list, optional): list of features for splitting contexts. Defaults to None.
             customer_classes (list, optional): list of customer classes. Defaults to None.
             context_generator_class (PriceContextGenerator, optional): type of context generator used. Defaults to None.
             context_generation_rate (integer, optional): rate in days for context generation. Defaults to None.
             confidence (float, optional): Hoeffding confidence. Defaults to None.
-            incremental_generation (bool, optional): choose wether generation is incremental or from scratch. Defaults to None.
-            approximate (bool, optional): choose wether considering pricing problem as disjoint from bidding problem. Defaults to None.
+            incremental_generation (bool, optional): choose whether generation is incremental or from scratch. Defaults to None.
+            approximate (bool, optional): choose whether considering pricing problem as disjoint from bidding problem. Defaults to None.
 
         Returns:
             Learner: the learner

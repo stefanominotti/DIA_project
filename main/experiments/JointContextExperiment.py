@@ -12,11 +12,11 @@ class JointContextExperiment(Experiment):
 
         Args:
             negative_probability_threshold (float): reward negative probability threshold under which an arm can't be pulled
-            incremental_generation (bool): choose wether context generation is incremental or from scratch
+            incremental_generation (bool): choose whether context generation is incremental or from scratch
             contextGenerator (PriceContextGenerator): type of context generator to use
             generation_rate (int): rate in days for context generation
             confidence (float): Hoeffding confidence
-            approximate (bool): choose wether considering pricing problem as disjoint from bidding problem
+            approximate (bool): choose whether considering pricing problem as disjoint from bidding problem
         """
 
         super().__init__(**kwargs)

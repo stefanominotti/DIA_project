@@ -12,7 +12,7 @@ class JointExperiment(Experiment):
 
         Args:
             negative_probability_threshold (float): reward negative probability threshold under which an arm can't be pulled
-            approximate (bool): choose wether considering pricing problem as disjoint from bidding problem
+            approximate (bool): choose whether considering pricing problem as disjoint from bidding problem
         """
 
         super().__init__(**kwargs)

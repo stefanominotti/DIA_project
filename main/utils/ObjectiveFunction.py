@@ -23,7 +23,7 @@ class ObjectiveFunction(object):
         """Get the optimal bid and price with or without price discrimination
 
         Args:
-            price_discrimination (bool, optional): wether or not discrimination for pricing. Defaults to False.
+            price_discrimination (bool, optional): whether or not discrimination for pricing. Defaults to False.
 
         Returns:
             tuple: tuplo containg optimal reward(s), optimal price(s) and optimal bid

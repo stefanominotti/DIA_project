@@ -17,7 +17,7 @@ class Experiment(ABC):
         Args:
             scenario (Scenario): object representing the scenario
             learner_class (PriceLearner/PriceBidGTSLearner/PriceBidGPTSLearner): type of learner used
-            price_discrimination (boolean): choose wether performing price discrimination
+            price_discrimination (boolean): choose whether performing price discrimination
             fixed_bid (float, optional): bid if bid is fixed. Defaults to None.
             fixed_price (float, optional): price if bid is fixed. Defaults to None.
             n_exp (int, optional): number of iterations to perform. Defaults to 1.

@@ -12,7 +12,7 @@ class PriceContextExperiment(Experiment):
         """Class constructor
 
         Args:
-            incremental_generation (bool): choose wether context generation is incremental or from scratch
+            incremental_generation (bool): choose whether context generation is incremental or from scratch
             contextGenerator (PriceContextGenerator): type of context generator to use
             generation_rate (int): rate in days for context generation
             confidence (float): Hoeffding confidence
