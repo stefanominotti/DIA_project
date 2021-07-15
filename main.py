@@ -38,7 +38,7 @@ parser.add_argument('--conf', dest='confidence', default=0.05, type=float, help=
 parser.add_argument('--approx', dest='approximate', default='T', choices=['F', 'T'], help='Choose whether the joint algorithm should be approximated or not (default \'T\'), only if --exp is set to \'joint\'')
 parser.add_argument('--learners', dest='learner_class', choices=['UCB', 'TS', 'GTS', 'GPTS'], required=True, nargs='+', help='Select the learners to use, \'UCB\' and \'TS\' can be selected only if --exp is set to \'price\'; \'GTS\' and \'GPTS\' can be selectedn only if --exp is set to \'bid\' or \'joint\'')
 parser.add_argument('--cgens', dest='contextGenerator', choices=['G', 'BF'], nargs='+', help='Choose the type of context generation between Greedy and Brute-force or both, only if --disc is set to \'T\'')
-parser.add_argument('--save', dest='save', default='F', choices=['T', 'F'], help='Choose whether to save or not the results as JSON file')
+parser.add_argument('--save', dest='save', choices=['T', 'F'], required=True, help='Choose whether to save or not the results as JSON file')
 args = parser.parse_args()
 
 # Transform boolean variables from string to bool

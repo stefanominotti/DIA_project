@@ -59,7 +59,7 @@ class PriceBidGPTSLearner(object):
                 if price_discrimination:
                     super().__init__(bid_arms, price_arms, negative_probability_threshold, returns_horizon, features, customer_classes, context_generator_class, context_generation_rate, confidence, incremental_generation, approximate)
                 else:
-                    super().__init__(bid_arms, price_arms, negative_probability_threshold, returns_horizon)
+                    super().__init__(bid_arms, price_arms, negative_probability_threshold, returns_horizon, approximate)
 
             def update(self, pulled_arm, customers):
                 super().update(pulled_arm, customers)
