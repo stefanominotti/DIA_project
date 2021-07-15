@@ -4,7 +4,20 @@ from main.environment.Environment import Environment
 
 
 class PriceContextExperiment(Experiment):
+    """
+    Class representing an experiment of pricing with fixed bid with price discrimination
+    """
+    
     def __init__(self, incremental_generation, contextGenerator, generation_rate, confidence, **kwargs):
+        """Class constructor
+
+        Args:
+            incremental_generation (bool): choose wether context generation is incremental or from scratch
+            contextGenerator (PriceContextGenerator): type of context generator to use
+            generation_rate (int): rate in days for context generation
+            confidence (float): Hoeffding confidence
+        """
+
         super().__init__(**kwargs)
         self.contextGenerator = contextGenerator
         self.generation_rate = generation_rate
@@ -13,6 +26,12 @@ class PriceContextExperiment(Experiment):
         self.reward_per_experiment = [[[] for exp in range(self.n_exp)] for _ in range(len(self.scen.customer_classes))]
 
     def run(self):
+        """Run the experiment
+
+        Returns:
+            list: list of optimal arms for each iteration
+        """
+        
         optimal_arms = []
         for exp in range(self.n_exp):
             env = Environment(self.scen)

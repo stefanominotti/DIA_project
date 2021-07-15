@@ -3,6 +3,10 @@ import json
 from main.environment.Environment import CustomerClass
 
 class Scenario(object):
+    """
+    Generates a class representing a scenario starting from its description provided as JSON file
+    """
+    
     def __init__(self, scenario_json):
         with open("main/environment/scenarios/" + scenario_json + ".json") as f:
             self.data = json.load(f)

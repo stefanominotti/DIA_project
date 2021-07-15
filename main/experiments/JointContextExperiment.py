@@ -3,7 +3,22 @@ from main.environment.Environment import Environment
 
 
 class JointContextExperiment(Experiment):
+    """
+    Class representing an experiment of joint bidding and pricing with price discrimination
+    """
+    
     def __init__(self, negative_probability_threshold, incremental_generation, contextGenerator, generation_rate, confidence, approximate, **kwargs):
+        """Class constructor
+
+        Args:
+            negative_probability_threshold (float): reward negative probability threshold under which an arm can't be pulled
+            incremental_generation (bool): choose wether context generation is incremental or from scratch
+            contextGenerator (PriceContextGenerator): type of context generator to use
+            generation_rate (int): rate in days for context generation
+            confidence (float): Hoeffding confidence
+            approximate (bool): choose wether considering pricing problem as disjoint from bidding problem
+        """
+
         super().__init__(**kwargs)
         self.negative_probability_threshold = negative_probability_threshold
         self.incremental_generation = incremental_generation
@@ -14,6 +29,12 @@ class JointContextExperiment(Experiment):
         self.reward_per_experiment = [[[] for exp in range(self.n_exp)] for _ in self.scen.customer_classes]
 
     def run(self):
+        """Run the experiment
+
+        Returns:
+            list: list of optimal arms for each iteration
+        """
+
         optimal_arms = []
         for exp in range(self.n_exp):
             env = Environment(self.scen)
