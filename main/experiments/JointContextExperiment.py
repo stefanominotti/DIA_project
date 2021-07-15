@@ -47,7 +47,7 @@ class JointContextExperiment(Experiment):
                 if day > self.scen.returns_horizon:
                     delayed_customers = customers_per_day.pop(0)
                     bid = bids_per_day.pop(0)
-                    if day < self.scen.rounds_horizon + self.scen.returns_horizon:
+                    if day < self.scen.rounds_horizon:
                         learner.update(bid, delayed_customers)
                     for class_idx, customer_class in enumerate(self.scen.customer_classes):
                         class_customers = list(filter(lambda customer: customer.customer_class == customer_class, delayed_customers))

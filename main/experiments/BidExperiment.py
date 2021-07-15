@@ -12,10 +12,10 @@ class BidExperiment(Experiment):
         optimal_arms = []
         for exp in range(self.n_exp):
             env = Environment(self.scen)
-            learner = self.learner_class(self.scen.bids, 
-                                        [self.fixed_price[0]], 
-                                        self.negative_probability_threshold, 
-                                        self.scen.returns_horizon)
+            learner = self.learner_class(bid_arms=self.scen.bids, 
+                                        price_arms=[self.fixed_price[0]], 
+                                        negative_probability_threshold=self.negative_probability_threshold, 
+                                        returns_horizon=self.scen.returns_horizon)
             customers_per_day = []
             bids_per_day = []
 
@@ -32,7 +32,7 @@ class BidExperiment(Experiment):
                 if day > self.scen.returns_horizon:
                     delayed_customers = customers_per_day.pop(0)
                     bid = bids_per_day.pop(0)
-                    if day < self.scen.rounds_horizon + self.scen.returns_horizon:
+                    if day < self.scen.rounds_horizon:
                         learner.update(bid, delayed_customers)
                     reward = 0
                     converted_customers = list(filter(lambda customer: customer.conversion == 1, delayed_customers))

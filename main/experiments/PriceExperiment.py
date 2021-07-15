@@ -24,7 +24,7 @@ class PriceExperiment(Experiment):
                 if day > self.scen.returns_horizon:
                     delayed_customers = customers_per_day.pop(0)
                     self.reward_per_experiment[0][exp].append(sum(list(map(lambda x: x.conversion * x.conversion_price * (1 + x.returns_count) - x.cost_per_click, delayed_customers))))
-                    if day < self.scen.rounds_horizon + self.scen.returns_horizon:
+                    if day < self.scen.rounds_horizon:
                         learner.update(delayed_customers)
             optimal_arms.append(learner.get_optimal_arm())
         return optimal_arms

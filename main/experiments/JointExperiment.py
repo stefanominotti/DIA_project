@@ -35,7 +35,7 @@ class JointExperiment(Experiment):
                 if day > self.scen.returns_horizon:
                     delayed_customers = customers_per_day.pop(0)
                     bid = bids_per_day.pop(0)
-                    if day < self.scen.rounds_horizon + self.scen.returns_horizon:
+                    if day < self.scen.rounds_horizon:
                         learner.update(bid, delayed_customers)
                     reward = 0
                     converted_customers = list(filter(lambda customer: customer.conversion == 1, delayed_customers))
